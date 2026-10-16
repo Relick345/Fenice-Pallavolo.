@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendario Partite Fenice</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; }
+        h1 { text-align: center; color: #2E75B6; }
+        table { width: 80%; margin: 20px auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #333; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+        .in-casa { color: #2E75B6; font-weight: bold; }
+        .fuori-casa { color: #C00000; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Calendario Fenice (Aggiornamento in Tempo Reale)</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Campionato</th>
+                <th>Giorno</th>
+                <th>Ora</th>
+                <th>Luogo</th>
+                <th>Avversario</th>
+            </tr>
+        </thead>
+        <tbody id="tabella-partite">
+            <!-- I dati verranno inseriti qui da Firebase -->
+        </tbody>
+    </table>
+
+    <script type="module">
+        // Importazioni CDN corrette per un file HTML puro
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+        // La tua configurazione Firebase esatta
+        const firebaseConfig = {
+          apiKey: "AIzaSyAwdCnqiZ3qirg3M1nRDceq9y_VQ83ApOo",
+          authDomain: "calendario-fenice.firebaseapp.com",
+          projectId: "calendario-fenice",
+          storageBucket: "calendario-fenice.firebasestorage.app",
+          messagingSenderId: "292051376406",
+          appId: "1:292051376406:web:e821eeb0fa377caadc1837",
+          measurementId: "G-18FC66W7KB"
+        };
+
+        // Inizializza l'app Firebase e il database
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Punta alla collezione "partite" e ordina per "Giorno"
+        const partiteRef = collection(db, "partite");
+        const q = query(partiteRef, orderBy("Giorno"));
+        
+        // Ascolta le modifiche in tempo reale
+        onSnapshot(q, (snapshot) => {
+            const tbody = document.getElementById('tabella-partite');
+            tbody.innerHTML = ""; 
+
+            snapshot.forEach((doc) => {
+                const partita = doc.data();
+                const riga = document.createElement('tr');
+                
+                const classeLuogo = partita['In casa / Fuori casa'] === 'In casa' ? 'in-casa' : 'fuori-casa';
+
+                riga.innerHTML = `
+                    <td>${partita.Campionato || ''}</td>
+                    <td>${partita.Giorno || ''}</td>
+                    <td>${partita.Ora || ''}</td>
+                    <td class="${classeLuogo}">${partita['In casa / Fuori casa'] || ''}</td>
+                    <td>${partita.Avversario || ''}</td>
+                `;
+                tbody.appendChild(riga);
+            });
+        }, (error) => {
+            console.error("Errore nel caricamento dei dati: ", error);
+        });
+    </script>
+</body>
+</html>
