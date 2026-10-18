@@ -10,14 +10,20 @@
         .sub-sync { text-align: center; font-size: 0.85rem; color: #666; margin-bottom: 15px; }
 
         .top-bar { width: 90%; max-width: 1100px; margin: 0 auto 15px auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: white; padding: 12px 18px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
+        
         .status-badge { font-size: 0.9rem; padding: 5px 12px; border-radius: 20px; background: #eee; }
         .status-verified { background: #d4edda; color: #155724; font-weight: bold; }
         .status-unverified { background: #f8d7da; color: #721c24; }
+        .status-warning { background: #fff3cd; color: #856404; font-weight: bold; } /* Colore per l'attesa del PIN */
 
         button { cursor: pointer; padding: 8px 14px; border: none; border-radius: 5px; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
         .btn-primary { background-color: #2E75B6; color: white; }
         .btn-primary:hover { background-color: #1f5282; }
         .btn-danger { background-color: #dc3545; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #218838; }
+
+        #auth-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
         #admin-panel { display: none; width: 90%; max-width: 1100px; margin: 0 auto 20px auto; background: white; padding: 18px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-left: 5px solid #2E75B6; }
         #admin-panel h3 { margin-top: 0; color: #2E75B6; }
@@ -42,13 +48,21 @@
     <!-- Barra Login -->
     <div class="top-bar">
         <span id="user-status" class="status-badge">Modalità Visitatore (Sola lettura)</span>
-        <div>
+        
+        <div id="auth-actions">
             <button id="btn-login" class="btn-primary">🔐 Accedi con Google per Modificare</button>
+            
+            <!-- NUOVO: Casella PIN integrata e anti-blocco -->
+            <div id="pin-section" style="display: none; align-items: center; gap: 5px;">
+                <input type="password" id="input-pin" placeholder="Inserisci PIN" style="padding: 7px; width: 100px; border-radius: 4px; border: 1px solid #ccc;">
+                <button id="btn-conferma-pin" class="btn-success">Sblocca</button>
+            </div>
+            
             <button id="btn-logout" class="btn-danger" style="display: none;">Esci</button>
         </div>
     </div>
 
-    <!-- Pannello Aggiunta Partita (Visibile solo agli utenti verificati) -->
+    <!-- Pannello Aggiunta Partita (Visibile solo agli utenti verificati E sbloccati col PIN) -->
     <div id="admin-panel">
         <h3>➕ Aggiungi Partita direttamente nel File Excel (Google Drive)</h3>
         <form id="form-aggiungi">
@@ -105,7 +119,7 @@
             "mariannacoccimiglio@gmail.com"
         ];
 
-        // PIN di sicurezza richiesto dopo il login
+        // PIN DI SICUREZZA
         const PIN_SEGRETO = "1234";
 
         const app = initializeApp(firebaseConfig);
@@ -114,70 +128,94 @@
 
         let emailCorrente = null;
         let isVerificato = false;
+        let isSbloccato = false; // Nuovo stato per controllare se il PIN è stato inserito
         let partiteCache = [];
         let ultimoJson = "";
 
-        // Imposta la persistenza a "sessione": se chiudi la scheda, ti scollega (più sicuro)
+        // Imposta la sessione per disconnettersi quando si chiude il browser (più sicuro)
         setPersistence(auth, browserSessionPersistence);
 
-        // FUNZIONE DI LOGIN (Ora il PIN viene chiesto QUI dentro)
-        document.getElementById('btn-login').onclick = async () => {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const email = result.user.email.toLowerCase();
-                
-                if (EMAIL_VERIFICATE.includes(email)) {
-                    let pinInserito = prompt(`Benvenuto ${email}!\n\nInserisci il PIN di sicurezza per sbloccare le modifiche:`);
-                    
-                    if (pinInserito === PIN_SEGRETO) {
-                        alert("Accesso consentito.");
-                    } else {
-                        alert("PIN errato. Accesso negato.");
-                        await signOut(auth);
-                    }
-                } else {
-                    alert("Email non autorizzata.");
-                    await signOut(auth);
-                }
-            } catch (error) {
-                console.log("Login annullato o errore:", error);
-            }
-        };
-
+        document.getElementById('btn-login').onclick = () => signInWithPopup(auth, provider);
         document.getElementById('btn-logout').onclick = () => signOut(auth);
 
+        // Quando cambia lo stato di autenticazione (Login/Logout effettuato)
         onAuthStateChanged(auth, (user) => {
             const statusEl = document.getElementById('user-status');
             const adminPanel = document.getElementById('admin-panel');
             const thAzioni = document.getElementById('th-azioni');
+            const pinSection = document.getElementById('pin-section');
+            const btnLogin = document.getElementById('btn-login');
+            const btnLogout = document.getElementById('btn-logout');
+
+            // Reset stato sicurezza ad ogni cambio utente
+            isSbloccato = false;
+            document.getElementById('input-pin').value = '';
 
             if (user) {
                 emailCorrente = user.email.toLowerCase();
 
                 if (EMAIL_VERIFICATE.includes(emailCorrente)) {
                     isVerificato = true;
-                    document.getElementById('btn-login').style.display = 'none';
-                    document.getElementById('btn-logout').style.display = 'inline-block';
-                    statusEl.textContent = `✅ Sbloccato: ${emailCorrente}`;
-                    statusEl.className = "status-badge status-verified";
-                    adminPanel.style.display = 'block';
-                    thAzioni.style.display = 'table-cell';
+                    btnLogin.style.display = 'none';
+                    btnLogout.style.display = 'inline-block';
+                    
+                    // Mostra la casella per il PIN nella barra, ma tiene nascosto il pannello di modifica
+                    pinSection.style.display = 'flex';
+                    adminPanel.style.display = 'none';
+                    thAzioni.style.display = 'none';
+                    
+                    statusEl.textContent = `🔒 In attesa di PIN (${emailCorrente})`;
+                    statusEl.className = "status-badge status-warning";
                 } else {
-                    signOut(auth);
+                    isVerificato = false;
+                    btnLogin.style.display = 'none';
+                    btnLogout.style.display = 'inline-block';
+                    pinSection.style.display = 'none';
+                    adminPanel.style.display = 'none';
+                    thAzioni.style.display = 'none';
+                    
+                    statusEl.textContent = `⛔ Non autorizzato (${emailCorrente})`;
+                    statusEl.className = "status-badge status-unverified";
                 }
             } else {
                 emailCorrente = null;
                 isVerificato = false;
-                document.getElementById('btn-login').style.display = 'inline-block';
-                document.getElementById('btn-logout').style.display = 'none';
-                statusEl.textContent = "Modalità Visitatore (Sola lettura)";
-                statusEl.className = "status-badge";
+                btnLogin.style.display = 'inline-block';
+                btnLogout.style.display = 'none';
+                pinSection.style.display = 'none';
                 adminPanel.style.display = 'none';
                 thAzioni.style.display = 'none';
+                
+                statusEl.textContent = "Modalità Visitatore (Sola lettura)";
+                statusEl.className = "status-badge";
             }
             disegnaTabella();
         });
 
+        // Gestione del click sul pulsante "Sblocca" per verificare il PIN
+        document.getElementById('btn-conferma-pin').onclick = () => {
+            const pinIn = document.getElementById('input-pin').value;
+            
+            if (pinIn === PIN_SEGRETO) {
+                isSbloccato = true;
+                
+                // PIN Corretto: Aggiorna l'interfaccia visiva e mostra i poteri di modifica
+                document.getElementById('pin-section').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('th-azioni').style.display = 'table-cell';
+                
+                const statusEl = document.getElementById('user-status');
+                statusEl.textContent = `✅ Sbloccato: ${emailCorrente}`;
+                statusEl.className = "status-badge status-verified";
+                
+                disegnaTabella(); // Ridisegna la tabella per mostrare le caselle dei risultati
+            } else {
+                alert("PIN errato! Riprova.");
+                document.getElementById('input-pin').value = ''; // Svuota la casella
+            }
+        };
+
+        // Lettura dal Foglio Google
         async function leggiFoglioGoogle(forzaRidisegno = false) {
             if (!forzaRidisegno && document.activeElement && document.activeElement.classList.contains('input-risultato')) {
                 return;
@@ -200,6 +238,7 @@
             }
         }
 
+        // Disegna la Tabella
         function disegnaTabella() {
             const tbody = document.getElementById('tabella-partite');
             tbody.innerHTML = "";
@@ -211,7 +250,8 @@
                 let htmlRisultato = `<span class="risultato-badge">${p.Risultato || 'Da giocare'}</span>`;
                 let htmlAzioni = '';
 
-                if (isVerificato) {
+                // Mostra i comandi solo se l'utente è verificato E ha inserito il PIN corretto
+                if (isVerificato && isSbloccato) {
                     htmlRisultato = `
                         <input type="text" class="input-risultato" id="ris-${p.rigaExcel}" value="${p.Risultato}" placeholder="es. 3-1">
                         <button class="btn-primary" onclick="salvaRisultato(${p.rigaExcel})">💾</button>
@@ -236,6 +276,7 @@
             });
         }
 
+        // Invio modifiche
         async function inviaAlFoglio(payload) {
             document.getElementById('sync-indicator').textContent = "⏳ Salvataggio nel Foglio Google in corso...";
             await fetch(URL_FOGLIO_GOOGLE, {
