@@ -87,7 +87,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, browserSessionPersistence, setPersistence } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAwdCnqiZ3qirg3M1nRDceq9y_VQ83ApOo",
@@ -105,7 +105,7 @@
             "mariannacoccimiglio@gmail.com"
         ];
 
-        // PIN di sicurezza richiesto dopo il login con un'email verificata
+        // PIN di sicurezza richiesto dopo il login
         const PIN_SEGRETO = "1234";
 
         const app = initializeApp(firebaseConfig);
@@ -117,7 +117,33 @@
         let partiteCache = [];
         let ultimoJson = "";
 
-        document.getElementById('btn-login').onclick = () => signInWithPopup(auth, provider);
+        // Imposta la persistenza a "sessione": se chiudi la scheda, ti scollega (più sicuro)
+        setPersistence(auth, browserSessionPersistence);
+
+        // FUNZIONE DI LOGIN (Ora il PIN viene chiesto QUI dentro)
+        document.getElementById('btn-login').onclick = async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const email = result.user.email.toLowerCase();
+                
+                if (EMAIL_VERIFICATE.includes(email)) {
+                    let pinInserito = prompt(`Benvenuto ${email}!\n\nInserisci il PIN di sicurezza per sbloccare le modifiche:`);
+                    
+                    if (pinInserito === PIN_SEGRETO) {
+                        alert("Accesso consentito.");
+                    } else {
+                        alert("PIN errato. Accesso negato.");
+                        await signOut(auth);
+                    }
+                } else {
+                    alert("Email non autorizzata.");
+                    await signOut(auth);
+                }
+            } catch (error) {
+                console.log("Login annullato o errore:", error);
+            }
+        };
+
         document.getElementById('btn-logout').onclick = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
@@ -129,29 +155,15 @@
                 emailCorrente = user.email.toLowerCase();
 
                 if (EMAIL_VERIFICATE.includes(emailCorrente)) {
-                    // Chiede il PIN solo se l'email è nella lista
-                    let pinInserito = prompt("Inserisci il PIN di sicurezza per abilitare le modifiche:");
-                    
-                    if (pinInserito === PIN_SEGRETO) {
-                        isVerificato = true;
-                        document.getElementById('btn-login').style.display = 'none';
-                        document.getElementById('btn-logout').style.display = 'inline-block';
-                        statusEl.textContent = `✅ Sbloccato: ${emailCorrente}`;
-                        statusEl.className = "status-badge status-verified";
-                        adminPanel.style.display = 'block';
-                        thAzioni.style.display = 'table-cell';
-                    } else {
-                        alert("PIN errato. Accesso negato.");
-                        signOut(auth); // Scollega l'utente se sbaglia il PIN
-                    }
-                } else {
-                    isVerificato = false;
+                    isVerificato = true;
                     document.getElementById('btn-login').style.display = 'none';
                     document.getElementById('btn-logout').style.display = 'inline-block';
-                    statusEl.textContent = `⛔ Non autorizzato (${emailCorrente})`;
-                    statusEl.className = "status-badge status-unverified";
-                    adminPanel.style.display = 'none';
-                    thAzioni.style.display = 'none';
+                    statusEl.textContent = `✅ Sbloccato: ${emailCorrente}`;
+                    statusEl.className = "status-badge status-verified";
+                    adminPanel.style.display = 'block';
+                    thAzioni.style.display = 'table-cell';
+                } else {
+                    signOut(auth);
                 }
             } else {
                 emailCorrente = null;
