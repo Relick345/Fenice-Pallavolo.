@@ -9,7 +9,7 @@
         h1 { text-align: center; color: #2E75B6; margin-bottom: 5px; }
         .sub-sync { text-align: center; font-size: 0.85rem; color: #666; margin-bottom: 15px; }
 
-        .top-bar { width: 90%; max-width: 1100px; margin: 0 auto 15px auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: white; padding: 12px 18px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
+        .top-bar { width: 90%; max-width: 1200px; margin: 0 auto 15px auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; background: white; padding: 12px 18px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); }
         
         .status-badge { font-size: 0.9rem; padding: 5px 12px; border-radius: 20px; background: #eee; }
         .status-verified { background: #d4edda; color: #155724; font-weight: bold; }
@@ -25,13 +25,13 @@
 
         #auth-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
-        #admin-panel { display: none; width: 90%; max-width: 1100px; margin: 0 auto 20px auto; background: white; padding: 18px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-left: 5px solid #2E75B6; }
+        #admin-panel { display: none; width: 90%; max-width: 1200px; margin: 0 auto 20px auto; background: white; padding: 18px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-left: 5px solid #2E75B6; }
         #admin-panel h3 { margin-top: 0; color: #2E75B6; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
         .form-grid input, .form-grid select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; }
         .btn-full-width { grid-column: 1 / -1; margin-top: 5px; }
 
-        table { width: 90%; max-width: 1100px; margin: 0 auto 30px auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        table { width: 90%; max-width: 1200px; margin: 0 auto 30px auto; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; font-size: 0.95rem; }
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
         th { background-color: #333; color: white; }
         tr:hover { background-color: #f1f1f1; }
@@ -40,9 +40,8 @@
         .risultato-badge { font-weight: bold; padding: 4px 8px; border-radius: 4px; background: #eef4fa; color: #2E75B6; }
         .input-risultato { width: 80px; padding: 6px; border: 1px solid #bbb; border-radius: 4px; text-align: center; font-weight: bold; }
         
-        /* Stili extra per le nuove colonne */
-        .td-gara { font-weight: bold; color: #666; font-size: 0.9rem; }
-        .td-via { font-size: 0.8rem; color: #555; max-width: 220px; line-height: 1.3; }
+        .td-gara { font-weight: bold; color: #666; }
+        .td-via { font-size: 0.85rem; color: #555; max-width: 250px; line-height: 1.3; }
     </style>
 </head>
 <body>
@@ -92,8 +91,9 @@
         <table>
             <thead>
                 <tr>
-                    <th>N° Gara</th>
+                    <!-- Allineato perfettamente all'ordine del file Excel -->
                     <th>Campionato</th>
+                    <th>N° Gara</th>
                     <th>Giorno</th>
                     <th>Ora</th>
                     <th>Luogo</th>
@@ -262,9 +262,10 @@
                     `;
                 }
 
+                // Genera la riga seguendo ESATTAMENTE l'ordine: Campionato, Gara, Giorno, Ora, Luogo, Avversario, Via, Risultato
                 tr.innerHTML = `
-                    <td class="td-gara">${p.Gara || ''}</td>
                     <td>${p.Campionato || ''}</td>
+                    <td class="td-gara">${p.Gara || ''}</td>
                     <td>${p.Giorno || ''}</td>
                     <td>${p.Ora || ''}</td>
                     <td class="${classeLuogo}">${p.Luogo || ''}</td>
