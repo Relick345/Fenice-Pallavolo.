@@ -76,6 +76,13 @@
   #admin-panel h3{margin-top:0;background:var(--flame-gradient);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
   .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
   .form-grid input,.form-grid select{padding:9px;border:1px solid var(--border);border-radius:6px;font-size:.9rem;background:var(--card);color:var(--text)}
+  .campionato-wrap{display:flex;gap:4px}
+  .campionato-wrap input{flex:1;min-width:0}
+  .btn-scegli-campionato{padding:0 10px;background:var(--card-2);color:var(--primary);border:1px solid var(--border);border-radius:6px;font-weight:bold}
+  #popup-campionati{position:fixed;z-index:999;display:none;background:var(--card);border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.2);padding:8px;max-width:260px;max-height:240px;overflow-y:auto;animation:fadeInUp .15s ease}
+  #popup-campionati .voce{padding:8px 10px;border-radius:6px;cursor:pointer;font-size:.88rem;color:var(--text)}
+  #popup-campionati .voce:hover{background:var(--card-2);color:var(--primary)}
   .btn-full-width{grid-column:1/-1;margin-top:4px}
 
   .matches{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
@@ -85,6 +92,8 @@
   .match-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
   .match-top{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--card-2);font-size:.78rem;color:var(--text-soft);flex-wrap:wrap;gap:6px}
   .match-top .camp-tag{background:var(--flame-gradient);color:#fff;padding:3px 10px;border-radius:12px;font-weight:bold;font-size:.7rem;margin-right:6px;display:inline-block}
+  .tag-passata{color:#fff;background:var(--danger);font-size:.64rem;font-weight:bold;padding:2px 7px;border-radius:9px;margin-left:6px;display:inline-block;vertical-align:middle;animation:pulsaPiano 2s ease-in-out infinite}
+  @keyframes pulsaPiano{ 0%,100%{opacity:1} 50%{opacity:.6} }
   .match-body{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;gap:10px;flex-wrap:wrap}
   .team{flex:1;min-width:130px;font-weight:bold;font-size:.95rem;display:flex;align-items:center;gap:8px;color:var(--text)}
   .team.casa{color:var(--flame-orange)}
@@ -148,7 +157,10 @@
   <h3>➕ Aggiungi Partita</h3>
   <form id="form-aggiungi">
     <div class="form-grid">
-      <input type="text" id="nuovo-campionato" placeholder="Campionato (es. Under 19)" list="elenco-campionati" autocomplete="off" required>
+      <div class="campionato-wrap">
+        <input type="text" id="nuovo-campionato" placeholder="Campionato (es. Under 19)" list="elenco-campionati" autocomplete="off" required>
+        <button type="button" class="btn-scegli-campionato" data-target="nuovo-campionato" title="Scegli tra le categorie esistenti">▾</button>
+      </div>
       <datalist id="elenco-campionati"></datalist>
       <input type="text" id="nuova-gara" placeholder="N° Gara (es. 249)">
       <input type="text" id="nuovo-giorno" placeholder="Giorno (gg/mm/aaaa)" required>
@@ -164,6 +176,8 @@
     </div>
   </form>
 </div>
+
+<div id="popup-campionati"></div>
 
 <div class="matches" id="lista-partite">
   <div class="empty">Caricamento dal Foglio Google in corso...</div>
@@ -295,6 +309,10 @@ async function leggiFoglioGoogle(forza=false){
   }catch(err){ console.error("Errore lettura Foglio Google:", err); }
 }
 
+function partitaPassata(p){
+  return parseDataOra(p.Giorno, p.Ora).getTime() < Date.now();
+}
+
 function parseDataOra(giorno, ora){
   const pg = (giorno||"").split("/");
   const po = (ora||"0:0").replace(".",":").split(":");
@@ -368,7 +386,10 @@ function disegnaLista(){
       card.innerHTML = `
         <div class="match-top"><span class="camp-tag">${escapeHtml(p.Campionato)}</span> Modifica partita Gara ${escapeHtml(p.Gara)}</div>
         <div class="edit-grid">
-          <input type="text" id="edit-camp-${p.rigaExcel}" placeholder="Campionato" list="elenco-campionati" autocomplete="off" value="${escapeHtml(p.Campionato)}">
+          <div class="campionato-wrap">
+            <input type="text" id="edit-camp-${p.rigaExcel}" placeholder="Campionato" list="elenco-campionati" autocomplete="off" value="${escapeHtml(p.Campionato)}">
+            <button type="button" class="btn-scegli-campionato" data-target="edit-camp-${p.rigaExcel}" title="Scegli tra le categorie esistenti">▾</button>
+          </div>
           <input type="text" id="edit-gara-${p.rigaExcel}" placeholder="N. Gara" value="${escapeHtml(p.Gara)}">
           <input type="text" id="edit-giorno-${p.rigaExcel}" placeholder="gg/mm/aaaa" value="${escapeHtml(p.Giorno)}">
           <input type="text" id="edit-ora-${p.rigaExcel}" placeholder="hh:mm" value="${escapeHtml(p.Ora)}">
@@ -410,7 +431,7 @@ function disegnaLista(){
 
     card.innerHTML = `
       <div class="match-top">
-        <span><span class="camp-tag">${escapeHtml(p.Campionato)}</span>Gara ${escapeHtml(p.Gara)} · ${escapeHtml(p.Giorno)} · ${escapeHtml(p.Ora)}</span>
+        <span><span class="camp-tag">${escapeHtml(p.Campionato)}</span>Gara ${escapeHtml(p.Gara)} · ${escapeHtml(p.Giorno)} · ${escapeHtml(p.Ora)}${(partitaPassata(p) && !ris) ? '<span class="tag-passata">GIÀ GIOCATA · DA SEGNARE</span>' : ''}</span>
       </div>
       <div class="match-body">
         <div class="team casa">${escapeHtml(squadraCasa)}</div>
@@ -432,18 +453,35 @@ function disegnaLista(){
 // campo Ora avendo scritto solo "17" lo completa in "17:00".
 // Funziona sia sul form "Aggiungi partita" sia sulle righe in modifica
 // (create dinamicamente) grazie alla delega sugli eventi del document.
+// Riposiziona il cursore dopo aver ricostruito il testo con gli / o i :
+// (senza questo, modificare una cifra in mezzo alla data "sballava" il
+// cursore e bisognava riscrivere tutto da capo).
+function riposizionaCursore(el, out, cifrePrimaDelCursore){
+  let pos = 0, contate = 0;
+  while (pos < out.length && contate < cifrePrimaDelCursore){
+    if (/\d/.test(out[pos])) contate++;
+    pos++;
+  }
+  el.setSelectionRange(pos, pos);
+}
 function formattaCampoData(el){
+  const posCursore = el.selectionStart ?? el.value.length;
+  const cifrePrimaDelCursore = el.value.slice(0, posCursore).replace(/\D/g, '').length;
   const cifre = el.value.replace(/\D/g, '').slice(0, 8);
   let out = cifre;
   if (cifre.length > 4) out = cifre.slice(0,2) + '/' + cifre.slice(2,4) + '/' + cifre.slice(4);
   else if (cifre.length > 2) out = cifre.slice(0,2) + '/' + cifre.slice(2);
   el.value = out;
+  riposizionaCursore(el, out, cifrePrimaDelCursore);
 }
 function formattaCampoOra(el){
+  const posCursore = el.selectionStart ?? el.value.length;
+  const cifrePrimaDelCursore = el.value.slice(0, posCursore).replace(/\D/g, '').length;
   const cifre = el.value.replace(/\D/g, '').slice(0, 4);
   let out = cifre;
   if (cifre.length > 2) out = cifre.slice(0,2) + ':' + cifre.slice(2);
   el.value = out;
+  riposizionaCursore(el, out, cifrePrimaDelCursore);
 }
 function completaCampoOra(el){
   let v = el.value.trim();
@@ -459,6 +497,36 @@ document.addEventListener('input', (e) => {
 document.addEventListener('focusout', (e) => {
   const id = e.target.id || '';
   if (id === 'nuova-ora' || id.startsWith('edit-ora-')) completaCampoOra(e.target);
+});
+
+// Menu "scegli categoria esistente": il <datalist> nativo su alcuni
+// browser/telefoni filtra le opzioni in base al testo già presente nel
+// campo (es. se c'è scritto "2Div" mostra solo quella), quindi qui
+// costruiamo un piccolo menu a tendina che mostra SEMPRE tutte le
+// categorie esistenti, qualunque sia il testo già scritto nel campo.
+const popupCampionati = document.getElementById('popup-campionati');
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-scegli-campionato');
+  if (btn){
+    const targetId = btn.dataset.target;
+    const categorie = [...new Set(partiteCache.map(p => p.Campionato).filter(Boolean))].sort();
+    popupCampionati.innerHTML = categorie.map(c => `<div class="voce" data-val="${escapeHtml(c)}">${escapeHtml(c)}</div>`).join('') || '<div class="voce">Nessuna categoria ancora</div>';
+    const r = btn.getBoundingClientRect();
+    popupCampionati.style.left = Math.max(8, r.left - 150) + 'px';
+    popupCampionati.style.top = (r.bottom + 6) + 'px';
+    popupCampionati.style.display = 'block';
+    popupCampionati.dataset.target = targetId;
+    e.stopPropagation();
+    return;
+  }
+  const voce = e.target.closest('#popup-campionati .voce');
+  if (voce && voce.dataset.val){
+    const input = document.getElementById(popupCampionati.dataset.target);
+    if (input) input.value = voce.dataset.val;
+    popupCampionati.style.display = 'none';
+    return;
+  }
+  if (!e.target.closest('#popup-campionati')) popupCampionati.style.display = 'none';
 });
 
 document.getElementById('search-box').addEventListener('input', (e) => {
