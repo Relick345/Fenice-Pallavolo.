@@ -75,6 +75,13 @@
   .chip.active{background:var(--orange);border-color:var(--orange);color:var(--on-orange)}
   .chip.chip-all{background:#2b2420;border-color:#2b2420;color:#fff}
   .chip.chip-all.active{background:var(--orange);border-color:var(--orange);color:var(--on-orange)}
+  .chip.chip-matita{background:transparent;border-style:dashed;color:var(--accent)}
+  .chip.chip-edit{display:inline-flex;align-items:center;gap:2px;padding:3px 4px}
+  .chip.chip-edit button{background:transparent;color:var(--accent);font-size:1.2rem;line-height:1;padding:4px 9px;border-radius:14px}
+  .chip.chip-edit button:disabled{opacity:.25}
+  .chip.chip-edit span{padding:0 2px}
+  .chips-actions{display:flex;gap:8px;margin-bottom:10px}
+  .chips-actions button{flex:1}
   .search-row{display:flex;gap:8px}
   .search-row input{flex:1;min-width:0;padding:11px 14px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:var(--card);color:var(--text)}
   .search-row input:focus{outline:2px solid var(--primary);outline-offset:1px}
@@ -95,32 +102,33 @@
   .btn-full-width{grid-column:1/-1;margin-top:4px}
 
   /* ---------- Schede partita ---------- */
-  .matches{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-  .match-card{background:var(--card);border-radius:16px;box-shadow:0 3px 12px rgba(0,0,0,.08);overflow:hidden;
-    border-left:6px solid var(--orange);animation:fadeInUp .4s ease both; transition:transform .2s ease, box-shadow .2s ease;}
+  .matches{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  .match-card{background:var(--card);border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;
+    border-left:5px solid var(--orange);animation:fadeInUp .4s ease both; transition:transform .2s ease, box-shadow .2s ease;}
   .match-card.fuori{border-left-color:var(--red)}
   .match-card::after{content:"";display:block;height:4px;background:var(--flame-gradient)}
   .match-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
 
   .match-top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px 2px;font-size:.8rem;color:var(--text-soft)}
   .camp-tag{background:var(--orange);color:var(--on-orange);padding:4px 11px;border-radius:12px;font-weight:800;font-size:.74rem;display:inline-block;white-space:nowrap}
-  .when{display:flex;gap:6px;align-items:center;font-weight:700;color:var(--text);white-space:nowrap}
-  .when .ora{background:var(--yellow);color:var(--on-orange);padding:3px 9px;border-radius:10px;font-weight:800}
+  .when{display:flex;gap:6px;align-items:center;font-weight:700;color:var(--text-soft);white-space:nowrap}
+  .when .ora{color:var(--text);font-weight:800}
 
-  .match-body{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;padding:14px}
+  .match-body{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;padding:10px 14px 8px}
   .team{font-weight:800;font-size:1rem;line-height:1.2;text-align:center;overflow-wrap:anywhere;color:var(--text)}
   .team.noi{color:var(--accent)}
   .score{text-align:center;min-width:56px}
   .score .ris{display:inline-block;white-space:nowrap;font-size:1.5rem;font-weight:900;color:var(--text);
-    background:var(--card-2);border:2px solid var(--orange);border-radius:12px;padding:3px 12px}
+    border:2px solid var(--orange);border-radius:12px;padding:2px 12px}
   .score .vs{font-size:.8rem;font-weight:800;color:var(--text-soft);letter-spacing:1px}
   .tag-passata{display:block;margin-top:5px;color:#fff;background:var(--red-dark);font-size:.62rem;font-weight:800;padding:3px 8px;border-radius:9px;white-space:nowrap;animation:pulsaPiano 2s ease-in-out infinite}
   @keyframes pulsaPiano{ 0%,100%{opacity:1} 50%{opacity:.65} }
 
-  .match-bottom{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:9px 14px 12px;border-top:1px solid var(--border);font-size:.78rem;color:var(--text-soft)}
-  .pill{padding:3px 10px;border-radius:10px;font-weight:800;font-size:.72rem;white-space:nowrap}
-  .pill.casa{background:var(--orange);color:var(--on-orange)}
-  .pill.fuori{background:var(--red-dark);color:#fff}
+  .match-bottom{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:0 14px 12px;font-size:.76rem;color:var(--text-soft)}
+  .pill{padding:0;font-weight:800;font-size:.72rem;letter-spacing:.4px;white-space:nowrap}
+  .pill.casa{color:var(--accent)}
+  .pill.fuori{color:var(--red-dark)}
+  :root[data-theme="dark"] .pill.fuori{color:#FF7A66}
   .via{flex-basis:100%;overflow-wrap:anywhere}
 
   .input-risultato{width:90px;padding:8px;border:1px solid var(--border);border-radius:8px;text-align:center;font-weight:bold;font-size:16px;background:var(--card);color:var(--text)}
@@ -149,7 +157,12 @@
     /* categorie: una sola riga scorrevole, non occupano mezzo schermo */
     .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
     .chips::-webkit-scrollbar{display:none}
-    .match-body{padding:12px 10px;gap:6px}
+    .match-body{padding:8px 10px 6px;gap:6px}
+    .top-bar{padding:8px 10px;gap:6px}
+    .brand-row img{height:60px}
+    .divider{margin:8px auto 6px}
+    .sub-sync{margin-bottom:8px}
+    .filters{margin-bottom:10px}
     .team{font-size:.92rem}
     .score .ris{font-size:1.3rem;padding:3px 9px}
     .edit-grid,.form-grid{grid-template-columns:1fr 1fr}
@@ -231,7 +244,7 @@ const firebaseConfig = {
 };
 
 // METTI QUI L'URL DEL NUOVO APPS SCRIPT UNIFICATO (vedi Codice_Apps_Script.gs)
-const URL_FOGLIO_GOOGLE = "https://script.google.com/macros/s/AKfycbyza6mD1y0ZCwZhXQcImAzBAtJ-DOH3CH_Kplm8gmc7pDK7eNEbLQDMsPUMWkzNybHT/exec";
+const URL_FOGLIO_GOOGLE = "https://script.google.com/macros/s/AKfycbzSsI7gQcu32JH4uRnSkrtQB7DYEjVn0eSpLG57WBuBfLrUOhxqgulhgTUuW03-2d02/exec";
 
 const EMAIL_VERIFICATE = ["riccardonicchi27@gmail.com", "mariannacoccimiglio@gmail.com"];
 const PIN_SEGRETO = "1234";
@@ -245,6 +258,8 @@ let emailCorrente = null, isVerificato = false, isSbloccato = false;
 let partiteCache = [], ultimoJson = "", rigaInModifica = null;
 let categorieSelezionate = new Set(); // vuoto = tutte
 let testoRicerca = "";
+let ordineCategorie = [];      // ordine scelto dall'admin, uguale per tutti (salvato nello script Google)
+let modificaOrdine = false, ordineBozza = [];
 
 function escapeHtml(t){return (t||"").toString().replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
 
@@ -275,7 +290,7 @@ onAuthStateChanged(auth, (user) => {
   const btnLogin = document.getElementById('btn-login');
   const btnLogout = document.getElementById('btn-logout');
 
-  isSbloccato = false; rigaInModifica = null;
+  isSbloccato = false; rigaInModifica = null; modificaOrdine = false;
   document.getElementById('input-pin').value = '';
 
   if (user) {
@@ -323,18 +338,19 @@ document.getElementById('btn-conferma-pin').onclick = () => {
 };
 
 async function leggiFoglioGoogle(forza=false){
-  if (!forza && (rigaInModifica !== null || (document.activeElement && document.activeElement.classList.contains('input-risultato')))) return;
+  if (!forza && (modificaOrdine || rigaInModifica !== null || (document.activeElement && document.activeElement.classList.contains('input-risultato')))) return;
   try{
     const res = await fetch(URL_FOGLIO_GOOGLE + "?t=" + Date.now());
     const dati = await res.json();
     if (dati.status === "ok"){
-      const nuovoJson = JSON.stringify(dati.partite);
+      ordineCategorie = Array.isArray(dati.ordineCategorie) ? dati.ordineCategorie : [];
+      const nuovoJson = JSON.stringify([dati.partite, ordineCategorie]);
       if (forza || nuovoJson !== ultimoJson){
         ultimoJson = nuovoJson;
         partiteCache = dati.partite;
         disegnaTutto();
       }
-      if (dati.versione !== "v3-testo-puro") {
+      if (!/^v[34]/.test(dati.versione || "")) {
         document.getElementById('sync-indicator').textContent = "⚠️ Lo script collegato è una versione VECCHIA (orari non corretti). Rifai la distribuzione in Apps Script.";
       } else {
         document.getElementById('sync-indicator').textContent = "✅ In diretta · aggiornato alle " + new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
@@ -354,18 +370,57 @@ function parseDataOra(giorno, ora){
   return new Date(parseInt(pg[2]), parseInt(pg[1])-1, parseInt(pg[0]), parseInt(po[0]||0), parseInt(po[1]||0));
 }
 
-function disegnaChips(){
-  const categorie = [...new Set(partiteCache.map(p => p.Campionato).filter(Boolean))].sort();
+function categorieOrdinate(){
+  const tutte = [...new Set(partiteCache.map(p => p.Campionato).filter(Boolean))];
+  return tutte.sort((x, y) => {
+    const ix = ordineCategorie.indexOf(x), iy = ordineCategorie.indexOf(y);
+    if (ix === -1 && iy === -1) return x.localeCompare(y);
+    if (ix === -1) return 1;
+    if (iy === -1) return -1;
+    return ix - iy;
+  });
+}
 
-  // Suggerimenti per il campo "Campionato" quando aggiungi/modifichi una partita:
-  // mostra tutte le categorie già esistenti, ma restano scrivibili (se ne scrivi
-  // una nuova, es. "Terza Divisione", viene creata e apparirà una nuova chip).
+function disegnaChips(){
+  const categorie = categorieOrdinate();
+
+  // Suggerimenti per il campo "Campionato" nei form (categorie gia' esistenti)
   const datalist = document.getElementById('elenco-campionati');
   datalist.innerHTML = categorie.map(c => `<option value="${escapeHtml(c)}"></option>`).join('');
 
   const cont = document.getElementById('chips-categorie');
   cont.innerHTML = "";
+  const azioni = document.getElementById('chips-azioni');
+  if (azioni) azioni.remove();
+  const admin = isVerificato && isSbloccato;
 
+  // ---- modalita' riordino (solo admin) ----
+  if (admin && modificaOrdine){
+    // aggiunge eventuali categorie nuove in fondo alla bozza, toglie quelle sparite
+    ordineBozza = ordineBozza.filter(c => categorie.includes(c)).concat(categorie.filter(c => !ordineBozza.includes(c)));
+    ordineBozza.forEach((cat, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-edit';
+      chip.innerHTML = `<button type="button" ${i===0?'disabled':''} aria-label="Sposta prima">‹</button><span>${escapeHtml(cat)}</span><button type="button" ${i===ordineBozza.length-1?'disabled':''} aria-label="Sposta dopo">›</button>`;
+      const [bSu, bGiu] = chip.querySelectorAll('button');
+      bSu.onclick = () => { [ordineBozza[i-1], ordineBozza[i]] = [ordineBozza[i], ordineBozza[i-1]]; disegnaChips(); };
+      bGiu.onclick = () => { [ordineBozza[i+1], ordineBozza[i]] = [ordineBozza[i], ordineBozza[i+1]]; disegnaChips(); };
+      cont.appendChild(chip);
+    });
+    const box = document.createElement('div');
+    box.id = 'chips-azioni'; box.className = 'chips-actions';
+    box.innerHTML = `<button type="button" class="btn-success">✔ Salva ordine</button><button type="button" class="btn-danger">✖ Annulla</button>`;
+    const [bSalva, bAnnulla] = box.querySelectorAll('button');
+    bSalva.onclick = async () => {
+      await inviaAlFoglio({ azione:"salva_ordine_categorie", ordine: ordineBozza });
+      modificaOrdine = false; disegnaTutto();
+    };
+    bAnnulla.onclick = () => { modificaOrdine = false; disegnaTutto(); };
+    cont.after(box);
+    return;
+  }
+
+  // ---- modalita' normale ----
   const chipTutte = document.createElement('span');
   chipTutte.className = 'chip chip-all' + (categorieSelezionate.size === 0 ? ' active' : '');
   chipTutte.textContent = 'Tutte';
@@ -383,6 +438,15 @@ function disegnaChips(){
     };
     cont.appendChild(chip);
   });
+
+  if (admin){
+    const matita = document.createElement('span');
+    matita.className = 'chip chip-matita';
+    matita.textContent = '✏️';
+    matita.title = 'Cambia l\'ordine delle categorie';
+    matita.onclick = () => { ordineBozza = categorie.slice(); modificaOrdine = true; disegnaChips(); };
+    cont.appendChild(matita);
+  }
 }
 
 function disegnaTutto(){
@@ -469,7 +533,7 @@ function disegnaLista(){
     card.innerHTML = `
       <div class="match-top">
         <span class="camp-tag">${escapeHtml(p.Campionato)}</span>
-        <span class="when"><span>${escapeHtml(p.Giorno)}</span><span class="ora">${escapeHtml(p.Ora)}</span></span>
+        <span class="when"><span>${escapeHtml(p.Giorno)}</span><span>·</span><span class="ora">${escapeHtml(p.Ora)}</span></span>
       </div>
       <div class="match-body">
         <div class="team ${inCasa ? 'noi' : ''}">${escapeHtml(squadraCasa)}</div>
@@ -478,7 +542,7 @@ function disegnaLista(){
       </div>
       <div class="match-bottom">
         <span class="pill ${inCasa ? 'casa' : 'fuori'}">${inCasa ? 'IN CASA' : 'FUORI CASA'}</span>
-        ${p.Gara ? `<span>Gara ${escapeHtml(p.Gara)}</span>` : ''}
+        ${p.Gara ? `<span>· Gara ${escapeHtml(p.Gara)}</span>` : ''}
         ${p.Via ? `<span class="via">📍 ${escapeHtml(p.Via)}</span>` : ''}
       </div>
       ${adminHtml}
