@@ -469,7 +469,7 @@ window.salvaModificaCompleta = async (r) => {
   };
   document.getElementById('sync-indicator').textContent = "⏳ Salvataggio in corso...";
   try{
-    const req = await fetch(URL_FOGLIO_GOOGLE, { method:"POST", body: JSON.stringify(payload) });
+    const req = await fetch(URL_FOGLIO_GOOGLE, { method:"POST", body: JSON.stringify({...payload, email: emailCorrente}) });
     const res = await req.json();
     if (res.status === "errore") alert("Errore dal server Google: " + res.messaggio);
     else { rigaInModifica = null; await leggiFoglioGoogle(true); }
