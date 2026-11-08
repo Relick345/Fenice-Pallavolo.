@@ -286,7 +286,7 @@ async function leggiFoglioGoogle(forza=false){
         partiteCache = dati.partite;
         disegnaTutto();
       }
-      if (dati.versione !== "v2-display-values") {
+      if (dati.versione !== "v3-testo-puro") {
         document.getElementById('sync-indicator').textContent = "⚠️ Lo script collegato è una versione VECCHIA (orari non corretti). Rifai la distribuzione in Apps Script.";
       } else {
         document.getElementById('sync-indicator').textContent = "✅ In diretta col Foglio Google (ultimo controllo: " + new Date().toLocaleTimeString() + ")";
@@ -426,6 +426,40 @@ function disegnaLista(){
     cont.appendChild(card);
   });
 }
+
+// Autoformattazione dei campi Giorno (gg/mm/aaaa) e Ora (hh:mm):
+// mette gli "/" e i ":" automaticamente mentre scrivi, e se esci dal
+// campo Ora avendo scritto solo "17" lo completa in "17:00".
+// Funziona sia sul form "Aggiungi partita" sia sulle righe in modifica
+// (create dinamicamente) grazie alla delega sugli eventi del document.
+function formattaCampoData(el){
+  const cifre = el.value.replace(/\D/g, '').slice(0, 8);
+  let out = cifre;
+  if (cifre.length > 4) out = cifre.slice(0,2) + '/' + cifre.slice(2,4) + '/' + cifre.slice(4);
+  else if (cifre.length > 2) out = cifre.slice(0,2) + '/' + cifre.slice(2);
+  el.value = out;
+}
+function formattaCampoOra(el){
+  const cifre = el.value.replace(/\D/g, '').slice(0, 4);
+  let out = cifre;
+  if (cifre.length > 2) out = cifre.slice(0,2) + ':' + cifre.slice(2);
+  el.value = out;
+}
+function completaCampoOra(el){
+  let v = el.value.trim();
+  if (/^\d{1,2}$/.test(v)) v = v.padStart(2,'0') + ':00';
+  else if (/^\d{1,2}:\d{1}$/.test(v)) { const [h,m] = v.split(':'); v = h.padStart(2,'0') + ':' + m + '0'; }
+  el.value = v;
+}
+document.addEventListener('input', (e) => {
+  const id = e.target.id || '';
+  if (id === 'nuovo-giorno' || id.startsWith('edit-giorno-')) formattaCampoData(e.target);
+  if (id === 'nuova-ora' || id.startsWith('edit-ora-')) formattaCampoOra(e.target);
+});
+document.addEventListener('focusout', (e) => {
+  const id = e.target.id || '';
+  if (id === 'nuova-ora' || id.startsWith('edit-ora-')) completaCampoOra(e.target);
+});
 
 document.getElementById('search-box').addEventListener('input', (e) => {
   testoRicerca = e.target.value;
