@@ -217,6 +217,13 @@
   .btn-ghost{background:var(--card-2);color:var(--text);border:1px solid var(--border)}
   .link-btn{display:block;margin:-4px auto 10px;background:none;color:var(--accent);padding:4px 8px;font-size:.78rem;text-decoration:underline}
   .link-btn[hidden]{display:none}
+  .utente-row{display:flex;align-items:center;gap:11px;background:var(--card-2);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
+  .utente-row img,.utente-row i{width:38px;height:38px;border-radius:50%;flex:none;object-fit:cover;background:var(--orange);color:var(--on-orange);font-style:normal;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .utente-row .tx{flex:1;min-width:0}
+  .utente-row .tx b,.utente-row .tx span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .utente-row .tx span{font-size:.78rem;color:var(--text-soft)}
+  .utente-row em{font-size:.74rem;font-style:normal;font-weight:800;color:var(--accent)}
+  .utente-row select{padding:8px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:var(--card);color:var(--text)}
 </style>
 </head>
 <body>
@@ -227,6 +234,7 @@
 </div>
 <div class="divider"></div>
 <div class="sub-sync" id="sync-indicator">🔄 Sincronizzato in diretta con Google Drive</div>
+<button id="btn-utenti" class="link-btn" hidden>Gestisci utenti e ruoli</button>
 <button id="btn-installa" class="link-btn" hidden>Installa l’app sul telefono</button>
 
 <div class="top-bar">
@@ -294,6 +302,13 @@
   </div>
 </div>
 
+<div id="sheet-utenti" class="sheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h3>Utenti e ruoli</h3><button data-chiudi aria-label="Chiudi">✕</button></div>
+    <div class="sheet-body" id="utenti-body"></div>
+  </div>
+</div>
+
 <div id="sheet-install" class="sheet" hidden>
   <div class="sheet-card">
     <div class="sheet-head"><h3>Installa l’app</h3><button data-chiudi aria-label="Chiudi">✕</button></div>
@@ -304,7 +319,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, browserLocalPersistence, setPersistence } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import { getFirestore, doc, collection, setDoc, updateDoc, writeBatch, getDocs, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getFirestore, doc, collection, setDoc, updateDoc, getDoc, writeBatch, getDocs, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAwdCnqiZ3qirg3M1nRDceq9y_VQ83ApOo",
@@ -373,10 +388,11 @@ onAuthStateChanged(auth, (user) => {
     btnLogout.style.display = 'inline-block';
     adminPanel.style.display = 'none';
     if (EMAIL_VERIFICATE.includes(emailCorrente)) {
-      isVerificato = true;
-      pinSection.style.display = 'flex';
-      statusEl.textContent = `🔒 In attesa di PIN (${emailCorrente})`;
-      statusEl.className = "status-badge status-warning";
+      isVerificato = true; isSbloccato = true;
+      pinSection.style.display = 'none';
+      adminPanel.style.display = 'block';
+      statusEl.textContent = `✅ Admin: ${emailCorrente}`;
+      statusEl.className = "status-badge status-verified";
     } else {
       isVerificato = false;
       pinSection.style.display = 'none';
@@ -946,6 +962,56 @@ if (!STANDALONE){
     }catch(e){}
   })();
 }
+
+/* ======= Utenti e ruoli: chi accede finisce in "utenti"; il proprietario decide Admin o Utente ======= */
+let unsubRuolo = null, unsubUtenti = null;
+function applicaRuolo(ruolo){
+  if (EMAIL_VERIFICATE.includes(emailCorrente)) return;   // admin fissi: restano col PIN
+  const st = $('user-status'), panel = $('admin-panel');
+  if (ruolo === 'admin'){
+    isVerificato = true; isSbloccato = true;
+    $('pin-section').style.display = 'none'; panel.style.display = 'block';
+    st.textContent = '✅ Admin: ' + emailCorrente; st.className = 'status-badge status-verified';
+    disegnaTutto();
+  } else {
+    const eraAdmin = isVerificato;
+    isVerificato = false; isSbloccato = false;
+    st.textContent = '👤 Accesso effettuato · sola lettura'; st.className = 'status-badge';
+    if (eraAdmin){ modificaOrdine = false; rigaInModifica = null; panel.style.display = 'none'; disegnaTutto(); }
+  }
+}
+onAuthStateChanged(auth, async u => {
+  if (unsubRuolo){ unsubRuolo(); unsubRuolo = null; }
+  if (unsubUtenti){ unsubUtenti(); unsubUtenti = null; }
+  $('btn-utenti').hidden = true;
+  if (!u) return;
+  const ref = doc(db,'utenti',u.uid), nome = u.displayName || u.email.split('@')[0];
+  try{
+    if ((await getDoc(ref)).exists()) await updateDoc(ref, { nome, avatar: u.photoURL || null, ultimoAccesso: serverTimestamp() });
+    else await setDoc(ref, { uid:u.uid, email:u.email, nome, avatar:u.photoURL || null, ruolo:'utente', creatoAt:serverTimestamp(), ultimoAccesso:serverTimestamp() });
+  }catch(e){ console.error(e); }
+  unsubRuolo = onSnapshot(ref, sn => applicaRuolo((sn.data() || {}).ruolo), () => {});
+  if ((u.email || '').toLowerCase() === EMAIL_PROPRIETARIO) $('btn-utenti').hidden = false;
+});
+$('btn-utenti').onclick = () => {
+  $('sheet-utenti').hidden = false;
+  if (unsubUtenti) return;
+  unsubUtenti = onSnapshot(query(collection(db,'utenti'), orderBy('ultimoAccesso','desc')), sn => {
+    const c = $('utenti-body'); c.innerHTML = sn.empty ? '<p class="muted">Nessun utente ancora.</p>' : '';
+    sn.forEach(d => {
+      const x = d.data(), fisso = EMAIL_VERIFICATE.includes((x.email || '').toLowerCase()), admin = x.ruolo === 'admin';
+      const r = document.createElement('div'); r.className = 'utente-row';
+      const av = x.avatar ? `<img src="${escapeHtml(x.avatar)}" alt="" referrerpolicy="no-referrer">` : `<i>${escapeHtml((x.nome || '?')[0].toUpperCase())}</i>`;
+      r.innerHTML = `${av}<div class="tx"><b>${escapeHtml(x.nome || '')}</b><span>${escapeHtml(x.email || '')}</span></div>` +
+        (fisso ? '<em>Admin fisso</em>' : `<select data-uid="${d.id}"><option value="utente"${admin ? '' : ' selected'}>Utente</option><option value="admin"${admin ? ' selected' : ''}>Admin</option></select>`);
+      c.appendChild(r);
+    });
+  }, () => { $('utenti-body').innerHTML = '<p class="muted">Non riesco a leggere gli utenti: controlla le regole Firebase.</p>'; });
+};
+document.addEventListener('change', e => {
+  const sel = e.target.closest('select[data-uid]');
+  if (sel) updateDoc(doc(db,'utenti',sel.dataset.uid), { ruolo: sel.value }).catch(() => alert('Ruolo non modificato.'));
+});
 
 leggiFoglioGoogle(true);
 setInterval(() => leggiFoglioGoogle(false), 5000);
