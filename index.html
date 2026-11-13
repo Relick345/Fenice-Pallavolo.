@@ -742,23 +742,20 @@ function toast(msg){
   t.textContent = msg; t.classList.add('on');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2400);
 }
-// Calendario: su Android apre direttamente "nuovo evento" del calendario del telefono (gia' compilato);
+// Calendario: su Android usa l'intent esplicito su content://com.android.calendar/events per aprire subito
+// l'app Calendario predefinita (Google Calendar / Calendario di sistema) con tutti i campi già pronti;
 // su iPhone apre la schermata "Aggiungi al calendario"; sul computer scarica il file .ics.
 function aggiungiAlCalendario(p){
   const d = dettagliPartita(p), enc = encodeURIComponent;
   if (ANDROID && !IN_APP){
-    const intent = 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;'
+    const intent = 'intent://com.android.calendar/events#Intent;scheme=content;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;'
       + 'S.title=' + enc(d.titolo) + ';S.eventLocation=' + enc(d.luogo) + ';S.description=' + enc(d.note) + ';'
       + 'l.beginTime=' + d.ini.getTime() + ';l.endTime=' + d.fine.getTime() + ';end';
-    const gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + enc(d.titolo)
-      + '&dates=' + dataIcs(d.ini) + '/' + dataIcs(d.fine) + '&details=' + enc(d.note) + '&location=' + enc(d.luogo);
-    let aperto = false;
-    const segna = () => { aperto = true; };
-    document.addEventListener('visibilitychange', segna, { once:true });
-    window.addEventListener('pagehide', segna, { once:true });
-    location.href = intent;
-    // se il telefono non ha aperto nessun calendario, ripiego su Google Calendar
-    setTimeout(() => { if (!aperto && document.visibilityState === 'visible') location.href = gcal; }, 2200);
+    const a = document.createElement('a');
+    a.href = intent;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     return;
   }
   const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Fenice Roma Pallavolo//Calendario//IT', 'BEGIN:VEVENT',
@@ -775,10 +772,13 @@ function aggiungiAlCalendario(p){
 async function condividiPartita(p){
   const d = dettagliPartita(p);
   const giorno = d.ini.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
-  const testo = d.titolo + '\n📅 ' + giorno + ' · ' + p.Ora + (p.Via ? '\n📍 ' + p.Via : '');
   const url = location.href.split('#')[0];
-  if (navigator.share){ try{ await navigator.share({ title:'Partita Fenice', text:testo, url }); }catch(e){} return; }
-  try{ await navigator.clipboard.writeText(testo + '\n' + url); toast('Testo copiato negli appunti'); }
+  const testoCompleto = d.titolo + '\n📅 ' + giorno + ' · ' + p.Ora + (p.Via ? '\n📍 ' + p.Via : '') + '\n🔗 ' + url;
+  // Passando solo title e text (con il link già dentro al testo, senza la proprietà "url" separata),
+  // Chrome su Android salta il pannello intermedio di Chrome e apre direttamente la schermata di condivisione
+  // principale del sistema con WhatsApp, Instagram, Gmail, ecc.
+  if (navigator.share){ try{ await navigator.share({ title:'Partita Fenice', text:testoCompleto }); }catch(e){} return; }
+  try{ await navigator.clipboard.writeText(testoCompleto); toast('Testo copiato negli appunti'); }
   catch(e){ toast('Condivisione non disponibile su questo browser'); }
 }
 document.addEventListener('click', e => {
