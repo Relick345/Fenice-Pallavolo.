@@ -225,6 +225,75 @@
   .utente-row .tx span{font-size:.78rem;color:var(--text-soft)}
   .utente-row em{font-size:.74rem;font-style:normal;font-weight:800;color:var(--accent)}
   .utente-row select{padding:8px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:var(--card);color:var(--text)}
+
+  /* ===== Ottimizzazione telefono v2 ===== */
+  body{position:relative;padding-bottom:calc(32px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
+  button,.chip{touch-action:manipulation}
+  /* pulsante chat: non copre più le schede, sta in alto a destra e scorre via con la pagina */
+  .fab{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:12px;bottom:auto;width:42px;height:42px;box-shadow:0 3px 10px rgba(226,59,43,.25)}
+  .fab svg{width:20px;height:20px}
+  .fab .dot{top:-5px;right:-5px}
+  .links-row{display:flex;justify-content:center;flex-wrap:wrap;gap:0 18px;margin:-4px 0 8px}
+  .links-row:not(:has(.link-btn:not([hidden]))){display:none}
+  .links-row .link-btn{margin:0;padding:6px 4px;font-size:.78rem}
+  #user-status{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;font-size:.8rem}
+
+  /* pannello admin comprimibile */
+  .add-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;color:var(--accent);font-size:1rem;font-weight:800;padding:4px 2px;min-height:44px}
+  .add-toggle i{font-style:normal;transition:transform .2s ease}
+  #admin-panel:not(.collapsed) .add-toggle i{transform:rotate(180deg)}
+  #admin-panel.collapsed #form-aggiungi{display:none}
+  #admin-panel:not(.collapsed) #form-aggiungi{margin-top:10px}
+  .form-grid{grid-template-columns:repeat(12,minmax(0,1fr));gap:10px 8px}
+  .form-grid > *{grid-column:span 12;min-width:0}
+  .form-grid > #nuova-gara{grid-column:span 5}
+  .form-grid > #nuovo-giorno{grid-column:span 7}
+  .form-grid > #nuova-ora{grid-column:span 5}
+  .form-grid > #nuovo-luogo{grid-column:span 7}
+  .form-grid input,.form-grid select,.edit-grid input,.edit-grid select{width:100%;min-height:46px;padding:10px 12px;border-radius:10px}
+  .campionato-wrap{min-width:0}
+  .btn-scegli-campionato{min-width:46px;border-radius:10px}
+  .edit-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .edit-grid > .campionato-wrap,.edit-grid > input:nth-of-type(n+4){grid-column:1/-1}
+
+  /* categorie: una riga scorrevole con sfumatura finale */
+  .chips{-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent);padding-right:26px;margin-bottom:8px}
+  .chip{padding:9px 16px;min-height:40px;display:inline-flex;align-items:center}
+  .search-row input{min-height:46px}
+
+  /* intestazione di giorno */
+  .day-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:baseline;gap:8px;margin:10px 2px -2px;padding:7px 4px;background:var(--bg);font-size:.78rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-soft)}
+  .day-head b{color:var(--accent)}
+  .matches{gap:10px}
+
+  /* schede partita più leggere */
+  .match-card{border-left-width:4px;border-radius:18px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+  .match-card::after{height:3px}
+  .match-top{padding:12px 14px 0}
+  .when .ora{font-size:1.05rem}
+  .match-body{padding:12px 12px 14px;gap:8px;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+  .team{font-size:.9rem;line-height:1.22;text-wrap:balance;hyphens:auto;-webkit-hyphens:auto}
+  .score{min-width:0}
+  .score .ris{font-size:1.25rem;padding:2px 10px;border-width:2px}
+  .match-bottom{margin:0 14px;padding:10px 0 12px;gap:4px 8px;font-size:.76rem}
+  a.via{display:flex;gap:6px;align-items:flex-start;color:var(--text-soft);text-decoration:none;min-height:30px;padding:4px 0}
+  a.via em{margin-left:auto;font-style:normal;color:var(--accent);font-weight:800;white-space:nowrap}
+  .action-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:10px 14px 12px}
+  .action-buttons .input-risultato{grid-column:1/-1;width:100%;min-height:46px}
+  .action-buttons > button{padding:11px 4px;font-size:.8rem;white-space:nowrap;min-height:44px}
+  .action-buttons > button:only-child{grid-column:1/-1}
+  @media (hover:none){.match-card:hover{transform:none;box-shadow:0 1px 6px rgba(0,0,0,.06)}}
+  @media (max-width:600px){
+    body{padding-left:12px;padding-right:12px}
+    .brand-row{padding:0 52px}
+    .brand-row img{height:58px}
+    h1{font-size:1.25rem}
+    .top-bar{padding:8px 10px;gap:8px;margin-bottom:10px}
+    #admin-panel{padding:6px 12px 10px;border-left-width:0;border-top:4px solid var(--orange);margin-bottom:12px}
+    .edit-grid,.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .form-grid{grid-template-columns:repeat(12,minmax(0,1fr))}
+    .action-buttons > button{flex:none}
+  }
 </style>
 </head>
 <body>
@@ -235,8 +304,7 @@
 </div>
 <div class="divider"></div>
 <div class="sub-sync" id="sync-indicator">🔄 Sincronizzato in diretta con Google Drive</div>
-<button id="btn-utenti" class="link-btn" hidden>Gestisci utenti e ruoli</button>
-<button id="btn-installa" class="link-btn" hidden>Installa l’app sul telefono</button>
+<div class="links-row"><button id="btn-utenti" class="link-btn" hidden>Gestisci utenti e ruoli</button><button id="btn-installa" class="link-btn" hidden>Installa l’app sul telefono</button></div>
 
 <div class="top-bar">
   <span id="user-status" class="status-badge">Modalità Visitatore (Sola lettura)</span>
@@ -258,12 +326,12 @@
 <div class="filters">
   <div class="chips" id="chips-categorie"></div>
   <div class="search-row">
-    <input type="text" id="search-box" placeholder="🔍 Cerca per avversario, es. Roma Volley...">
+    <input type="text" id="search-box" placeholder="🔍 Cerca avversario…" enterkeyhint="search">
   </div>
 </div>
 
-<div id="admin-panel">
-  <h3>➕ Aggiungi Partita</h3>
+<div id="admin-panel" class="collapsed">
+  <button type="button" id="toggle-add" class="add-toggle" aria-expanded="false"><span>➕ Aggiungi partita</span><i>▾</i></button>
   <form id="form-aggiungi">
     <div class="form-grid">
       <div class="campionato-wrap">
@@ -271,16 +339,16 @@
         <button type="button" class="btn-scegli-campionato" data-target="nuovo-campionato" title="Scegli tra le categorie esistenti">▾</button>
       </div>
       <datalist id="elenco-campionati"></datalist>
-      <input type="text" id="nuova-gara" placeholder="N° Gara (es. 249)">
-      <input type="text" id="nuovo-giorno" placeholder="Giorno (gg/mm/aaaa)" required>
-      <input type="text" id="nuova-ora" placeholder="Ora (es. 17:00)" required>
+      <input type="text" id="nuova-gara" placeholder="N° gara" inputmode="numeric">
+      <input type="text" id="nuovo-giorno" placeholder="gg/mm/aaaa" inputmode="numeric" required>
+      <input type="text" id="nuova-ora" placeholder="hh:mm" inputmode="numeric" required>
       <select id="nuovo-luogo">
         <option value="In casa">In casa</option>
         <option value="Fuori casa">Fuori casa</option>
       </select>
       <input type="text" id="nuovo-avversario" placeholder="Avversario" required>
-      <input type="text" id="nuova-via" placeholder="Via / Indirizzo palestra">
-      <input type="text" id="nuovo-risultato" placeholder="Risultato (opzionale)">
+      <input type="text" id="nuova-via" placeholder="Palestra / indirizzo">
+      <input type="text" id="nuovo-risultato" placeholder="Risultato (facoltativo)">
       <button type="submit" class="btn-primary btn-full-width">➕ Salva Partita</button>
     </div>
   </form>
@@ -550,6 +618,17 @@ function disegnaTutto(){
   disegnaLista();
 }
 
+function etichettaGiorno(g){
+  const pg = (g||"").split("/");
+  if (pg.length !== 3) return escapeHtml(g||"");
+  const d = new Date(parseInt(pg[2]), parseInt(pg[1])-1, parseInt(pg[0]));
+  const oggi = new Date(); oggi.setHours(0,0,0,0);
+  const diff = Math.round((d - oggi) / 864e5);
+  let txt = d.toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'});
+  if (d.getFullYear() !== oggi.getFullYear()) txt += ' ' + d.getFullYear();
+  const tag = diff === 0 ? 'Oggi' : diff === 1 ? 'Domani' : diff === -1 ? 'Ieri' : '';
+  return (tag ? '<b>' + tag + '</b> ' : '') + escapeHtml(txt);
+}
 function disegnaLista(){
   const cont = document.getElementById('lista-partite');
   cont.innerHTML = "";
@@ -571,7 +650,15 @@ function disegnaLista(){
     return;
   }
 
+  let ultimoGiorno = null;
   elenco.forEach((p, idx) => {
+    if (p.Giorno !== ultimoGiorno){
+      ultimoGiorno = p.Giorno;
+      const h = document.createElement('div');
+      h.className = 'day-head';
+      h.innerHTML = etichettaGiorno(p.Giorno);
+      cont.appendChild(h);
+    }
     const card = document.createElement('div');
     card.className = 'match-card';
     card.style.animationDelay = (Math.min(idx, 10) * 0.04) + 's';
@@ -619,8 +706,8 @@ function disegnaLista(){
     if (isVerificato && isSbloccato){
       adminHtml = `
         <div class="action-buttons">
-          <input type="text" class="input-risultato" id="ris-${p.rigaExcel}" value="${escapeHtml(p.Risultato)}" placeholder="es. 3-1">
-          <button class="btn-primary" onclick="salvaRisultato(${p.rigaExcel})">💾 Risultato</button>
+          <input type="text" class="input-risultato" id="ris-${p.rigaExcel}" value="${escapeHtml(p.Risultato)}" placeholder="Risultato, es. 3-1" inputmode="text">
+          <button class="btn-primary" onclick="salvaRisultato(${p.rigaExcel})">💾 Salva</button>
           <button class="btn-warning" onclick="abilitaModifica(${p.rigaExcel})">✏️ Modifica</button>
           <button class="btn-danger" onclick="eliminaRiga(${p.rigaExcel})">🗑️ Elimina</button>
         </div>`;
@@ -629,7 +716,7 @@ function disegnaLista(){
     card.innerHTML = `
       <div class="match-top">
         <span class="camp-tag">${escapeHtml(p.Campionato)}</span>
-        <span class="when"><span>${escapeHtml(p.Giorno)}</span><span>·</span><span class="ora">${escapeHtml(p.Ora)}</span></span>
+        <span class="when"><span class="ora">🕒 ${escapeHtml(p.Ora)}</span></span>
       </div>
       <div class="match-body">
         <div class="team ${inCasa ? 'noi' : ''}">${escapeHtml(squadraCasa)}</div>
@@ -639,7 +726,7 @@ function disegnaLista(){
       <div class="match-bottom">
         <span class="pill ${inCasa ? 'casa' : 'fuori'}">${inCasa ? 'IN CASA' : 'FUORI CASA'}</span>
         ${p.Gara ? `<span>· Gara ${escapeHtml(p.Gara)}</span>` : ''}
-        ${p.Via ? `<span class="via">📍 ${escapeHtml(p.Via)}</span>` : ''}
+        ${p.Via ? `<a class="via" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.Via)}" target="_blank" rel="noopener"><span>📍 ${escapeHtml(p.Via)}</span><em>Mappa ↗</em></a>` : ''}
       </div>
       ${adminHtml}
     `;
@@ -777,6 +864,11 @@ window.salvaModificaCompleta = async (r) => {
   }catch(err){ alert("Errore di connessione."); console.error(err); }
 };
 
+const pannelloAdmin = document.getElementById('admin-panel'), btnToggleAdd = document.getElementById('toggle-add');
+btnToggleAdd.onclick = () => {
+  const chiuso = pannelloAdmin.classList.toggle('collapsed');
+  btnToggleAdd.setAttribute('aria-expanded', String(!chiuso));
+};
 document.getElementById('form-aggiungi').addEventListener('submit', async (e) => {
   e.preventDefault();
   await inviaAlFoglio({
@@ -791,6 +883,7 @@ document.getElementById('form-aggiungi').addEventListener('submit', async (e) =>
     Risultato: document.getElementById('nuovo-risultato').value.trim()
   });
   e.target.reset();
+  pannelloAdmin.classList.add('collapsed'); btnToggleAdd.setAttribute('aria-expanded','false');
 });
 
 /* ======= Categorie nascoste (salvate in Firestore, valgono per tutti) ======= */
