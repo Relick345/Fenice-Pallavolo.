@@ -269,10 +269,10 @@
   /* schede partita più leggere */
   .match-card{border-left-width:4px;border-radius:18px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
   .match-card::after{height:3px}
-  .match-top{padding:12px 14px 0}
+  .match-top{padding:12px 14px 0;flex-wrap:wrap;row-gap:6px}
   .when .ora{font-size:1.05rem}
   .match-body{padding:12px 12px 14px;gap:8px;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
-  .team{font-size:.9rem;line-height:1.22;text-wrap:balance;hyphens:auto;-webkit-hyphens:auto}
+  .team{font-size:.9rem;line-height:1.22;text-wrap:balance;hyphens:manual;-webkit-hyphens:manual;overflow-wrap:break-word}
   .score{min-width:0}
   .score .ris{font-size:1.25rem;padding:2px 10px;border-width:2px}
   .match-bottom{margin:0 14px;padding:10px 0 12px;gap:4px 8px;font-size:.76rem}
@@ -301,24 +301,50 @@
   :root[data-theme="dark"] body::before{background:radial-gradient(120% 100% at 50% 0%,rgba(245,132,38,.22),transparent 70%)}
   .skel{height:150px;border-radius:18px;background:linear-gradient(100deg,var(--card) 30%,var(--card-2) 50%,var(--card) 70%);background-size:300% 100%;animation:shimmer 1.3s linear infinite;border:1px solid var(--border)}
   @keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:2px}
-  .stat{background:var(--card);border-radius:16px;padding:10px 6px 9px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06);border-bottom:3px solid var(--orange)}
-  .stat b{display:block;font-size:1.45rem;font-weight:900;line-height:1.1;color:var(--text)}
-  .stat span{font-size:.68rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-soft)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:0}
+  .stat{display:flex;align-items:baseline;justify-content:center;gap:6px;background:var(--card);border-radius:14px;padding:9px 6px;box-shadow:0 1px 6px rgba(0,0,0,.06);border-bottom:3px solid var(--orange)}
+  .stat b{font-size:1.2rem;font-weight:900;line-height:1;color:var(--text)}
+  .stat span{font-size:.64rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--text-soft)}
   .stat.v{border-bottom-color:var(--green)} .stat.p{border-bottom-color:var(--red)}
   .next-tag{display:inline-flex;align-items:center;gap:5px;background:var(--flame-gradient);color:var(--on-orange);font-weight:900;font-size:.66rem;letter-spacing:.7px;text-transform:uppercase;padding:4px 10px;border-radius:12px}
   .match-card.next{box-shadow:0 0 0 2px var(--orange),0 8px 22px rgba(245,132,38,.22)}
   .esito{font-weight:900;font-size:.66rem;letter-spacing:.7px;padding:3px 9px;border-radius:10px;color:#fff}
   .esito.win{background:var(--green)} .esito.loss{background:var(--red-dark)}
   .score .ris.win{border-color:var(--green)} .score .ris.loss{border-color:var(--red)}
-  .quick{display:flex;gap:8px;margin:0 14px;padding:0 0 13px;flex-wrap:wrap}
-  .quick a,.quick button{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 10px;border-radius:12px;background:var(--card-2);border:1px solid var(--border);color:var(--accent);font-size:.78rem;font-weight:800;text-decoration:none;white-space:nowrap}
-  .quick a:active,.quick button:active{background:var(--orange);color:var(--on-orange)}
   .section-head{display:flex;align-items:center;gap:10px;margin:22px 2px 2px;color:var(--text-soft);font-weight:900;font-size:.82rem;letter-spacing:.8px;text-transform:uppercase}
   .section-head::before,.section-head::after{content:"";flex:1;height:2px;border-radius:2px;background:var(--border)}
   .section-head span{background:var(--card-2);border:1px solid var(--border);padding:5px 12px;border-radius:14px}
   .match-card.giocata{opacity:.92;border-left-color:#b9a898}
   .match-card.giocata::after{background:var(--border)}
+
+  /* ===== rifinitura telefono v4 ===== */
+  a.via > span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  a.via em{font-size:1.05rem;line-height:1.1;align-self:center}
+  .action-buttons{grid-template-columns:minmax(0,1fr) 46px 46px 46px;gap:8px;padding:0 14px 14px;background:transparent}
+  .action-buttons .input-risultato{grid-column:auto;width:100%;text-align:left;padding:0 12px;font-weight:700}
+  .action-buttons > button{min-height:46px;padding:0;font-size:1.1rem;border-radius:12px}
+  .edit-grid + .action-buttons{grid-template-columns:1fr 1fr;padding-top:4px}
+  .edit-grid + .action-buttons > button{font-size:.9rem}
+
+  /* ===== v5: icone piccole, riepilogo meno stretto ===== */
+  .mini-grp{margin-left:auto;display:inline-flex;gap:8px;margin-top:-8px;margin-bottom:-8px}
+  .mini{width:36px;height:36px;border-radius:50%;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--card-2);border:1px solid var(--border);color:var(--accent);box-shadow:none}
+  .mini svg{width:18px;height:18px}
+  .mini:active{background:var(--orange);color:var(--on-orange);transform:scale(.92)}
+  .stat{display:block;text-align:center;padding:10px 6px 9px;border-radius:16px}
+  .stat b{display:block;font-size:1.4rem;line-height:1.1}
+  .stat span{display:block;margin-top:2px;font-size:.66rem;letter-spacing:.6px}
+  #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);max-width:88vw;background:#2b2420;color:#fff;padding:11px 18px;border-radius:14px;font-size:.85rem;font-weight:700;z-index:200;opacity:0;pointer-events:none;transition:opacity .2s;text-align:center}
+  #toast.on{opacity:1}
+
+  /* ===== v6 ===== */
+  .search-row input[type=search]{-webkit-appearance:none;appearance:none}
+  .chip{transition:transform .15s ease,background .2s ease,border-color .2s ease,color .2s ease,box-shadow .2s ease}
+  .chip.active{box-shadow:0 3px 10px rgba(245,132,38,.35)}
+  .chip.chip-all.active{box-shadow:0 3px 10px rgba(245,132,38,.35)}
+  .empty{padding:48px 16px;font-weight:700}
+  a.via em{display:inline-flex;align-items:center;gap:3px;font-size:.95rem;line-height:1.1;align-self:center}
+  a.via em small{font-size:.72rem;font-weight:800;letter-spacing:.2px}
 </style>
 </head>
 <body>
@@ -351,7 +377,7 @@
 <div class="filters">
   <div class="chips" id="chips-categorie"></div>
   <div class="search-row">
-    <input type="text" id="search-box" placeholder="🔍 Cerca avversario…" enterkeyhint="search">
+    <input type="search" id="search-box" placeholder="🔍 Cerca avversario…" enterkeyhint="search">
   </div>
 </div>
 
@@ -409,6 +435,8 @@
     <div class="sheet-body" id="inst-body"></div>
   </div>
 </div>
+
+<div id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
@@ -566,6 +594,11 @@ function categorieOrdinate(){
 }
 
 function disegnaChips(){
+  const riga = document.getElementById('chips-categorie'), x = riga.scrollLeft;
+  disegnaChipsBase();
+  riga.scrollLeft = x;
+}
+function disegnaChipsBase(){
   const categorie = categorieOrdinate();
 
   // Suggerimenti per il campo "Campionato" nei form (categorie gia' esistenti)
@@ -611,7 +644,14 @@ function disegnaChips(){
   const chipTutte = document.createElement('span');
   chipTutte.className = 'chip chip-all' + (tutteAttivo ? ' active' : '');
   chipTutte.textContent = 'Tutte';
-  chipTutte.onclick = () => { tutteAttivo = !(tutteAttivo && categorieSelezionate.size > 0); disegnaTutto(); };
+  chipTutte.onclick = () => {
+    if (navigator.vibrate) navigator.vibrate(8);
+    const sel = [...categorieSelezionate];
+    if (tutteAttivo){ if (sel.length) tutteAttivo = false; }                                  // «Tutte» + nascosta -> resta solo la nascosta
+    else if (sel.length && sel.every(c => categorieNascoste.includes(c))) tutteAttivo = true;  // solo nascoste: si accende anche «Tutte»
+    else { tutteAttivo = true; categorieSelezionate.clear(); }                                // categorie normali: si spengono tutte
+    disegnaTutto();
+  };
   cont.appendChild(chipTutte);
 
   categorie.forEach(cat => {
@@ -620,9 +660,10 @@ function disegnaChips(){
     chip.className = 'chip' + (categorieSelezionate.has(cat) ? ' active' : '') + (nascosta ? ' nascosta' : '');
     chip.innerHTML = (nascosta ? ICON_OFF : '') + escapeHtml(cat);
     chip.onclick = () => {
-      if (tutteAttivo && categorieSelezionate.size === 0) { tutteAttivo = false; categorieSelezionate.add(cat); }
+      if (navigator.vibrate) navigator.vibrate(8);
+      if (tutteAttivo && categorieSelezionate.size === 0) { tutteAttivo = false; categorieSelezionate.add(cat); }   // da «Tutte» si passa a quella sola categoria (anche nascosta)
       else if (categorieSelezionate.has(cat)) { categorieSelezionate.delete(cat); if (categorieSelezionate.size === 0) tutteAttivo = true; }
-      else categorieSelezionate.add(cat);
+      else { tutteAttivo = false; categorieSelezionate.add(cat); }                                                   // più categorie insieme
       disegnaTutto();
     };
     cont.appendChild(chip);
@@ -682,37 +723,70 @@ function tra(p){
   const d = Math.round((g1 - g0) / 864e5);
   return d <= 0 ? 'Oggi' : d === 1 ? 'Domani' : 'Tra ' + d + ' giorni';
 }
-const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-function linkIndicazioni(via){
-  const q = encodeURIComponent(via);
-  return iOS ? 'https://maps.apple.com/?daddr=' + q : 'https://www.google.com/maps/dir/?api=1&destination=' + q;
-}
-const pad = n => String(n).padStart(2,'0');
-const icsData = d => d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
-const icsTesto = t => (t||'').replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
-function scaricaIcs(p){
-  const ini = parseDataOra(p.Giorno, p.Ora), fine = new Date(ini.getTime() + 2*36e5);
+function dettagliPartita(p){
+  const ini = parseDataOra(p.Giorno, p.Ora), fine = new Date(ini.getTime() + 2 * 36e5);
   const inCasa = p.Luogo === 'In casa';
-  const titolo = (inCasa ? 'Fenice vs ' + p.Avversario : p.Avversario + ' vs Fenice') + ' (' + p.Campionato + ')';
-  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Fenice Roma Pallavolo//Calendario//IT','BEGIN:VEVENT',
-    'UID:' + chiaveDi(p) + '@calendario-fenice','DTSTAMP:' + icsData(new Date()),
-    'DTSTART:' + icsData(ini),'DTEND:' + icsData(fine),'SUMMARY:' + icsTesto(titolo),
-    'LOCATION:' + icsTesto(p.Via || ''),'DESCRIPTION:' + icsTesto('Gara ' + (p.Gara || '') + ' - ' + (inCasa ? 'In casa' : 'Fuori casa')),
-    'BEGIN:VALARM','TRIGGER:-PT1H','ACTION:DISPLAY','DESCRIPTION:Partita tra un\'ora','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
-  const url = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
+  return {
+    ini, fine,
+    titolo: (inCasa ? 'Fenice vs ' + p.Avversario : p.Avversario + ' vs Fenice') + ' · ' + p.Campionato,
+    luogo: p.Via || '',
+    note: 'Gara ' + (p.Gara || '-') + ' · ' + (inCasa ? 'In casa' : 'Fuori casa')
+  };
+}
+const pad2 = n => String(n).padStart(2, '0');
+const dataIcs = d => d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + 'T' + pad2(d.getHours()) + pad2(d.getMinutes()) + '00';
+const escIcs = t => (t || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+let toastTimer = null;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2400);
+}
+// Calendario: su Android apre direttamente "nuovo evento" del calendario del telefono (gia' compilato);
+// su iPhone apre la schermata "Aggiungi al calendario"; sul computer scarica il file .ics.
+function aggiungiAlCalendario(p){
+  const d = dettagliPartita(p), enc = encodeURIComponent;
+  if (ANDROID && !IN_APP){
+    const intent = 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;'
+      + 'S.title=' + enc(d.titolo) + ';S.eventLocation=' + enc(d.luogo) + ';S.description=' + enc(d.note) + ';'
+      + 'l.beginTime=' + d.ini.getTime() + ';l.endTime=' + d.fine.getTime() + ';end';
+    const gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + enc(d.titolo)
+      + '&dates=' + dataIcs(d.ini) + '/' + dataIcs(d.fine) + '&details=' + enc(d.note) + '&location=' + enc(d.luogo);
+    let aperto = false;
+    const segna = () => { aperto = true; };
+    document.addEventListener('visibilitychange', segna, { once:true });
+    window.addEventListener('pagehide', segna, { once:true });
+    location.href = intent;
+    // se il telefono non ha aperto nessun calendario, ripiego su Google Calendar
+    setTimeout(() => { if (!aperto && document.visibilityState === 'visible') location.href = gcal; }, 2200);
+    return;
+  }
+  const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Fenice Roma Pallavolo//Calendario//IT', 'BEGIN:VEVENT',
+    'UID:' + chiaveDi(p) + '@calendario-fenice', 'DTSTAMP:' + dataIcs(new Date()),
+    'DTSTART:' + dataIcs(d.ini), 'DTEND:' + dataIcs(d.fine), 'SUMMARY:' + escIcs(d.titolo),
+    'LOCATION:' + escIcs(d.luogo), 'DESCRIPTION:' + escIcs(d.note),
+    'BEGIN:VALARM', 'TRIGGER:-PT1H', 'ACTION:DISPLAY', 'DESCRIPTION:Partita tra un\'ora', 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  if (IOS){ location.href = 'data:text/calendar;charset=utf-8,' + enc(ics); return; }
+  const url = URL.createObjectURL(new Blob([ics], { type:'text/calendar' }));
   const a = document.createElement('a'); a.href = url; a.download = 'partita-fenice.ics';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+async function condividiPartita(p){
+  const d = dettagliPartita(p);
+  const giorno = d.ini.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+  const testo = d.titolo + '\n📅 ' + giorno + ' · ' + p.Ora + (p.Via ? '\n📍 ' + p.Via : '');
+  const url = location.href.split('#')[0];
+  if (navigator.share){ try{ await navigator.share({ title:'Partita Fenice', text:testo, url }); }catch(e){} return; }
+  try{ await navigator.clipboard.writeText(testo + '\n' + url); toast('Testo copiato negli appunti'); }
+  catch(e){ toast('Condivisione non disponibile su questo browser'); }
 }
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-ics],[data-share]');
   if (!b) return;
   const p = partiteCache.find(x => String(x.rigaExcel) === (b.dataset.ics || b.dataset.share));
   if (!p) return;
-  if (b.dataset.ics) scaricaIcs(p);
-  else {
-    const inCasa = p.Luogo === 'In casa';
-    navigator.share({ title: 'Partita Fenice', text: (inCasa ? 'Fenice vs ' + p.Avversario : p.Avversario + ' vs Fenice') + ' · ' + p.Giorno + ' ore ' + p.Ora + (p.Via ? ' · ' + p.Via : ''), url: location.href }).catch(() => {});
-  }
+  if (b.dataset.ics) aggiungiAlCalendario(p); else condividiPartita(p);
 });
 
 function etichettaGiorno(g){
@@ -743,7 +817,7 @@ function disegnaLista(){
   elenco.sort((a,b) => parseDataOra(a.Giorno, a.Ora) - parseDataOra(b.Giorno, b.Ora));
 
   if (elenco.length === 0){
-    cont.innerHTML = '<div class="empty">Nessuna partita trovata.' + (tutteAttivo && categorieNascoste.length ? '<br><small>Alcune categorie sono nascoste: toccale per vederle.</small>' : '') + '</div>';
+    cont.innerHTML = '<div class="empty"><div style="font-size:2.2rem;margin-bottom:6px">🏐</div>Nessuna partita trovata.' + (tutteAttivo && categorieNascoste.length ? '<br><small>Alcune categorie sono nascoste: toccale per vederle.</small>' : '') + '</div>';
     return;
   }
 
@@ -816,10 +890,10 @@ function disegnaLista(){
     if (isVerificato && isSbloccato){
       adminHtml = `
         <div class="action-buttons">
-          <input type="text" class="input-risultato" id="ris-${p.rigaExcel}" value="${escapeHtml(p.Risultato)}" placeholder="Risultato, es. 3-1" inputmode="text">
-          <button class="btn-primary" onclick="salvaRisultato(${p.rigaExcel})">💾 Salva</button>
-          <button class="btn-warning" onclick="abilitaModifica(${p.rigaExcel})">✏️ Modifica</button>
-          <button class="btn-danger" onclick="eliminaRiga(${p.rigaExcel})">🗑️ Elimina</button>
+          <input type="text" class="input-risultato" id="ris-${p.rigaExcel}" value="${escapeHtml(p.Risultato)}" placeholder="Risultato (es. 3-1)" inputmode="text">
+          <button class="btn-primary" onclick="salvaRisultato(${p.rigaExcel})" aria-label="Salva risultato" title="Salva risultato">💾</button>
+          <button class="btn-warning" onclick="abilitaModifica(${p.rigaExcel})" aria-label="Modifica partita" title="Modifica partita">✏️</button>
+          <button class="btn-danger" onclick="eliminaRiga(${p.rigaExcel})" aria-label="Elimina partita" title="Elimina partita">🗑️</button>
         </div>`;
     }
 
@@ -838,13 +912,9 @@ function disegnaLista(){
         <span class="pill ${inCasa ? 'casa' : 'fuori'}">${inCasa ? 'IN CASA' : 'FUORI CASA'}</span>
         ${esito ? `<span class="esito ${esito}">${esito === 'win' ? 'VITTORIA' : 'SCONFITTA'}</span>` : ''}
         ${p.Gara ? `<span>· Gara ${escapeHtml(p.Gara)}</span>` : ''}
-        ${p.Via ? `<a class="via" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.Via)}" target="_blank" rel="noopener"><span>📍 ${escapeHtml(p.Via)}</span><em>Mappa ↗</em></a>` : ''}
+        <span class="mini-grp"><button type="button" class="mini" data-ics="${p.rigaExcel}" aria-label="Aggiungi al calendario" title="Aggiungi al calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg></button><button type="button" class="mini" data-share="${p.rigaExcel}" aria-label="Condividi" title="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button></span>
+        ${p.Via ? `<a class="via" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.Via)}" target="_blank" rel="noopener"><span>📍 ${escapeHtml(p.Via)}</span><em aria-label="Apri la mappa"><small>Mappa</small> ↗</em></a>` : ''}
       </div>
-      ${!ris && !daSegnare ? `<div class="quick">
-        ${p.Via ? `<a href="${linkIndicazioni(p.Via)}" target="_blank" rel="noopener">🧭 Indicazioni</a>` : ''}
-        <button type="button" data-ics="${p.rigaExcel}">📅 Calendario</button>
-        ${navigator.share ? `<button type="button" data-share="${p.rigaExcel}">📤 Condividi</button>` : ''}
-      </div>` : ''}
       ${adminHtml}
     `;
     cont.appendChild(card);
