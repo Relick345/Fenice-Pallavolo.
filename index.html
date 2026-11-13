@@ -294,6 +294,31 @@
     .form-grid{grid-template-columns:repeat(12,minmax(0,1fr))}
     .action-buttons > button{flex:none}
   }
+
+  /* ===== Idee grafiche v3 ===== */
+  body::before{content:"";position:absolute;left:0;right:0;top:0;height:300px;z-index:-1;pointer-events:none;
+    background:radial-gradient(120% 100% at 50% 0%,rgba(245,132,38,.20),rgba(249,209,62,.07) 45%,transparent 75%)}
+  :root[data-theme="dark"] body::before{background:radial-gradient(120% 100% at 50% 0%,rgba(245,132,38,.22),transparent 70%)}
+  .skel{height:150px;border-radius:18px;background:linear-gradient(100deg,var(--card) 30%,var(--card-2) 50%,var(--card) 70%);background-size:300% 100%;animation:shimmer 1.3s linear infinite;border:1px solid var(--border)}
+  @keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:2px}
+  .stat{background:var(--card);border-radius:16px;padding:10px 6px 9px;text-align:center;box-shadow:0 1px 6px rgba(0,0,0,.06);border-bottom:3px solid var(--orange)}
+  .stat b{display:block;font-size:1.45rem;font-weight:900;line-height:1.1;color:var(--text)}
+  .stat span{font-size:.68rem;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--text-soft)}
+  .stat.v{border-bottom-color:var(--green)} .stat.p{border-bottom-color:var(--red)}
+  .next-tag{display:inline-flex;align-items:center;gap:5px;background:var(--flame-gradient);color:var(--on-orange);font-weight:900;font-size:.66rem;letter-spacing:.7px;text-transform:uppercase;padding:4px 10px;border-radius:12px}
+  .match-card.next{box-shadow:0 0 0 2px var(--orange),0 8px 22px rgba(245,132,38,.22)}
+  .esito{font-weight:900;font-size:.66rem;letter-spacing:.7px;padding:3px 9px;border-radius:10px;color:#fff}
+  .esito.win{background:var(--green)} .esito.loss{background:var(--red-dark)}
+  .score .ris.win{border-color:var(--green)} .score .ris.loss{border-color:var(--red)}
+  .quick{display:flex;gap:8px;margin:0 14px;padding:0 0 13px;flex-wrap:wrap}
+  .quick a,.quick button{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;padding:0 10px;border-radius:12px;background:var(--card-2);border:1px solid var(--border);color:var(--accent);font-size:.78rem;font-weight:800;text-decoration:none;white-space:nowrap}
+  .quick a:active,.quick button:active{background:var(--orange);color:var(--on-orange)}
+  .section-head{display:flex;align-items:center;gap:10px;margin:22px 2px 2px;color:var(--text-soft);font-weight:900;font-size:.82rem;letter-spacing:.8px;text-transform:uppercase}
+  .section-head::before,.section-head::after{content:"";flex:1;height:2px;border-radius:2px;background:var(--border)}
+  .section-head span{background:var(--card-2);border:1px solid var(--border);padding:5px 12px;border-radius:14px}
+  .match-card.giocata{opacity:.92;border-left-color:#b9a898}
+  .match-card.giocata::after{background:var(--border)}
 </style>
 </head>
 <body>
@@ -357,7 +382,7 @@
 <div id="popup-campionati"></div>
 
 <div class="matches" id="lista-partite">
-  <div class="empty">Caricamento dal Foglio Google in corso...</div>
+  <div class="skel"></div><div class="skel"></div><div class="skel"></div>
 </div>
 
 
@@ -388,7 +413,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, browserLocalPersistence, setPersistence } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
-import { getFirestore, doc, collection, setDoc, updateDoc, getDoc, writeBatch, getDocs, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+import { getFirestore, doc, collection, setDoc, updateDoc, getDoc, writeBatch, getDocs, onSnapshot, query, orderBy, serverTimestamp, deleteField } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAwdCnqiZ3qirg3M1nRDceq9y_VQ83ApOo",
@@ -618,6 +643,78 @@ function disegnaTutto(){
   disegnaLista();
 }
 
+let tsRisultati = {};   // quando e' stato inserito il risultato (salvato in Firestore: config/risultati)
+const DUE_GIORNI = 2 * 864e5;
+const chiavePartita = (c,g,d,a) => [c,g,d,a].map(x => (x||'').toString().trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')).join('__');
+const chiaveDi = p => chiavePartita(p.Campionato, p.Gara, p.Giorno, p.Avversario);
+function esitoDi(p){
+  const m = (p.Risultato||'').trim().match(/^(\d+)\s*[-–:]\s*(\d+)$/);
+  if (!m) return null;
+  const inCasa = p.Luogo === 'In casa';
+  const noi = parseInt(inCasa ? m[1] : m[2]), loro = parseInt(inCasa ? m[2] : m[1]);
+  return noi > loro ? 'win' : noi < loro ? 'loss' : null;
+}
+// "Gia' giocata" = ha il risultato e sono passati 2 giorni da quando e' stato inserito
+// (se non so quando e' stato inserito, conto dal giorno della partita)
+function giaGiocata(p){
+  if (!(p.Risultato||'').trim()) return false;
+  const base = tsRisultati[chiaveDi(p)] || parseDataOra(p.Giorno, p.Ora).getTime();
+  return Date.now() >= base + DUE_GIORNI;
+}
+async function aggiornaTs(vecchia, nuova, haRis){
+  const rif = doc(db,'config','risultati');
+  try{
+    const t = tsRisultati[vecchia];
+    if (vecchia !== nuova && t){
+      delete tsRisultati[vecchia];
+      await updateDoc(rif, { [vecchia]: deleteField() });
+      if (haRis){ tsRisultati[nuova] = t; await setDoc(rif, { [nuova]: t }, { merge:true }); }
+    } else if (haRis && !tsRisultati[nuova]){
+      tsRisultati[nuova] = Date.now(); await setDoc(rif, { [nuova]: tsRisultati[nuova] }, { merge:true });
+    } else if (!haRis && tsRisultati[nuova]){
+      delete tsRisultati[nuova]; await updateDoc(rif, { [nuova]: deleteField() });
+    }
+  }catch(e){ console.error('Data risultato non salvata:', e); }
+}
+function tra(p){
+  const t = parseDataOra(p.Giorno, p.Ora), now = new Date();
+  const g0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), g1 = new Date(t.getFullYear(), t.getMonth(), t.getDate());
+  const d = Math.round((g1 - g0) / 864e5);
+  return d <= 0 ? 'Oggi' : d === 1 ? 'Domani' : 'Tra ' + d + ' giorni';
+}
+const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+function linkIndicazioni(via){
+  const q = encodeURIComponent(via);
+  return iOS ? 'https://maps.apple.com/?daddr=' + q : 'https://www.google.com/maps/dir/?api=1&destination=' + q;
+}
+const pad = n => String(n).padStart(2,'0');
+const icsData = d => d.getFullYear() + pad(d.getMonth()+1) + pad(d.getDate()) + 'T' + pad(d.getHours()) + pad(d.getMinutes()) + '00';
+const icsTesto = t => (t||'').replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+function scaricaIcs(p){
+  const ini = parseDataOra(p.Giorno, p.Ora), fine = new Date(ini.getTime() + 2*36e5);
+  const inCasa = p.Luogo === 'In casa';
+  const titolo = (inCasa ? 'Fenice vs ' + p.Avversario : p.Avversario + ' vs Fenice') + ' (' + p.Campionato + ')';
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Fenice Roma Pallavolo//Calendario//IT','BEGIN:VEVENT',
+    'UID:' + chiaveDi(p) + '@calendario-fenice','DTSTAMP:' + icsData(new Date()),
+    'DTSTART:' + icsData(ini),'DTEND:' + icsData(fine),'SUMMARY:' + icsTesto(titolo),
+    'LOCATION:' + icsTesto(p.Via || ''),'DESCRIPTION:' + icsTesto('Gara ' + (p.Gara || '') + ' - ' + (inCasa ? 'In casa' : 'Fuori casa')),
+    'BEGIN:VALARM','TRIGGER:-PT1H','ACTION:DISPLAY','DESCRIPTION:Partita tra un\'ora','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const url = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
+  const a = document.createElement('a'); a.href = url; a.download = 'partita-fenice.ics';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-ics],[data-share]');
+  if (!b) return;
+  const p = partiteCache.find(x => String(x.rigaExcel) === (b.dataset.ics || b.dataset.share));
+  if (!p) return;
+  if (b.dataset.ics) scaricaIcs(p);
+  else {
+    const inCasa = p.Luogo === 'In casa';
+    navigator.share({ title: 'Partita Fenice', text: (inCasa ? 'Fenice vs ' + p.Avversario : p.Avversario + ' vs Fenice') + ' · ' + p.Giorno + ' ore ' + p.Ora + (p.Via ? ' · ' + p.Via : ''), url: location.href }).catch(() => {});
+  }
+});
+
 function etichettaGiorno(g){
   const pg = (g||"").split("/");
   if (pg.length !== 3) return escapeHtml(g||"");
@@ -650,8 +747,18 @@ function disegnaLista(){
     return;
   }
 
+  const giocate = elenco.filter(giaGiocata);          // restano in ordine cronologico: dalla piu' vecchia alla piu' recente
+  const attive = elenco.filter(p => !giaGiocata(p));
+  const prossima = attive.find(p => !partitaPassata(p));
+  const vinte = elenco.filter(p => esitoDi(p) === 'win').length, perse = elenco.filter(p => esitoDi(p) === 'loss').length;
+  const daGiocare = elenco.filter(p => !(p.Risultato||'').trim() && !partitaPassata(p)).length;
+  const stats = document.createElement('div');
+  stats.className = 'stats';
+  stats.innerHTML = `<div class="stat"><b>${daGiocare}</b><span>Da giocare</span></div><div class="stat v"><b>${vinte}</b><span>Vinte</span></div><div class="stat p"><b>${perse}</b><span>Perse</span></div>`;
+  cont.appendChild(stats);
+
   let ultimoGiorno = null;
-  elenco.forEach((p, idx) => {
+  const disegna = (p, idx) => {
     if (p.Giorno !== ultimoGiorno){
       ultimoGiorno = p.Giorno;
       const h = document.createElement('div');
@@ -697,9 +804,12 @@ function disegnaLista(){
     const squadraTrasferta = inCasa ? p.Avversario : NOI;
     const ris = (p.Risultato || "").trim();
     const daSegnare = partitaPassata(p) && !ris;
+    const esito = esitoDi(p);
+    if (giaGiocata(p)) card.classList.add('giocata');
+    if (p === prossima) card.classList.add('next');
 
     const scoreHtml = ris
-      ? `<div class="ris">${escapeHtml(ris)}</div>`
+      ? `<div class="ris ${esito || ''}">${escapeHtml(ris)}</div>`
       : `<div class="vs">VS</div>${daSegnare ? '<span class="tag-passata">DA SEGNARE</span>' : ''}`;
 
     let adminHtml = '';
@@ -716,6 +826,7 @@ function disegnaLista(){
     card.innerHTML = `
       <div class="match-top">
         <span class="camp-tag">${escapeHtml(p.Campionato)}</span>
+        ${p === prossima ? `<span class="next-tag">⚡ ${tra(p)}</span>` : ''}
         <span class="when"><span class="ora">🕒 ${escapeHtml(p.Ora)}</span></span>
       </div>
       <div class="match-body">
@@ -725,13 +836,28 @@ function disegnaLista(){
       </div>
       <div class="match-bottom">
         <span class="pill ${inCasa ? 'casa' : 'fuori'}">${inCasa ? 'IN CASA' : 'FUORI CASA'}</span>
+        ${esito ? `<span class="esito ${esito}">${esito === 'win' ? 'VITTORIA' : 'SCONFITTA'}</span>` : ''}
         ${p.Gara ? `<span>· Gara ${escapeHtml(p.Gara)}</span>` : ''}
         ${p.Via ? `<a class="via" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.Via)}" target="_blank" rel="noopener"><span>📍 ${escapeHtml(p.Via)}</span><em>Mappa ↗</em></a>` : ''}
       </div>
+      ${!ris && !daSegnare ? `<div class="quick">
+        ${p.Via ? `<a href="${linkIndicazioni(p.Via)}" target="_blank" rel="noopener">🧭 Indicazioni</a>` : ''}
+        <button type="button" data-ics="${p.rigaExcel}">📅 Calendario</button>
+        ${navigator.share ? `<button type="button" data-share="${p.rigaExcel}">📤 Condividi</button>` : ''}
+      </div>` : ''}
       ${adminHtml}
     `;
     cont.appendChild(card);
-  });
+  };
+  attive.forEach(disegna);
+  if (giocate.length){
+    const sh = document.createElement('div');
+    sh.className = 'section-head';
+    sh.innerHTML = `<span>✔ Già giocate · ${giocate.length}</span>`;
+    cont.appendChild(sh);
+    ultimoGiorno = null;
+    giocate.forEach(disegna);
+  }
 }
 
 // Autoformattazione dei campi Giorno (gg/mm/aaaa) e Ora (hh:mm):
@@ -835,12 +961,16 @@ async function inviaAlFoglio(payload){
 
 window.salvaRisultato = async (r) => {
   const val = document.getElementById(`ris-${r}`).value.trim();
+  const p = partiteCache.find(x => x.rigaExcel === r), k = p ? chiaveDi(p) : null;
   await inviaAlFoglio({ azione:"aggiorna_risultato", rigaExcel:r, risultato:val });
+  if (k) await aggiornaTs(k, k, !!val);
 };
 
 window.eliminaRiga = async (r) => {
   if (!confirm("Eliminare questa partita dal Foglio Google?")) return;
+  const p = partiteCache.find(x => x.rigaExcel === r), k = p ? chiaveDi(p) : null;
   await inviaAlFoglio({ azione:"elimina_partita", rigaExcel:r });
+  if (k) await aggiornaTs(k, k, false);
 };
 
 window.salvaModificaCompleta = async (r) => {
@@ -856,11 +986,15 @@ window.salvaModificaCompleta = async (r) => {
     Risultato: document.getElementById(`edit-ris-${r}`).value.trim()
   };
   document.getElementById('sync-indicator').textContent = "⏳ Salvataggio in corso...";
+  const vecchio = partiteCache.find(x => x.rigaExcel === r), kVecchia = vecchio ? chiaveDi(vecchio) : null;
   try{
     const req = await fetch(URL_FOGLIO_GOOGLE, { method:"POST", body: JSON.stringify({...payload, email: emailCorrente}) });
     const res = await req.json();
     if (res.status === "errore") alert("Errore dal server Google: " + res.messaggio);
-    else { rigaInModifica = null; await leggiFoglioGoogle(true); }
+    else {
+      await aggiornaTs(kVecchia || chiaveDi(payload), chiaveDi(payload), !!payload.Risultato);
+      rigaInModifica = null; await leggiFoglioGoogle(true);
+    }
   }catch(err){ alert("Errore di connessione."); console.error(err); }
 };
 
@@ -871,6 +1005,8 @@ btnToggleAdd.onclick = () => {
 };
 document.getElementById('form-aggiungi').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const nuovoRis = document.getElementById('nuovo-risultato').value.trim();
+  const kNuova = chiavePartita(document.getElementById('nuovo-campionato').value, document.getElementById('nuova-gara').value, document.getElementById('nuovo-giorno').value, document.getElementById('nuovo-avversario').value);
   await inviaAlFoglio({
     azione:"aggiungi_partita",
     Campionato: document.getElementById('nuovo-campionato').value.trim(),
@@ -883,11 +1019,13 @@ document.getElementById('form-aggiungi').addEventListener('submit', async (e) =>
     Risultato: document.getElementById('nuovo-risultato').value.trim()
   });
   e.target.reset();
+  if (nuovoRis) await aggiornaTs(kNuova, kNuova, true);
   pannelloAdmin.classList.add('collapsed'); btnToggleAdd.setAttribute('aria-expanded','false');
 });
 
 /* ======= Categorie nascoste (salvate in Firestore, valgono per tutti) ======= */
 const db = getFirestore(app);
+onSnapshot(doc(db,'config','risultati'), sn => { tsRisultati = sn.data() || {}; disegnaTutto(); }, () => {});
 onSnapshot(doc(db,'config','vista'), sn => { categorieNascoste = (sn.data() || {}).nascoste || []; disegnaTutto(); }, () => {});
 
 /* ======= Chat privata: scrive chiunque abbia fatto l’accesso, legge tutto solo Riccardo ======= */
@@ -1102,6 +1240,7 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => navigato
 
 leggiFoglioGoogle(true);
 setInterval(() => leggiFoglioGoogle(false), 5000);
+setInterval(() => { if (!modificaOrdine && rigaInModifica === null && !(document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) disegnaLista(); }, 60000);
 </script>
 </body>
 </html>
