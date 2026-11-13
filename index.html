@@ -328,7 +328,7 @@
 
   /* ===== v5: icone piccole, riepilogo meno stretto ===== */
   .mini-grp{margin-left:auto;display:inline-flex;gap:8px;margin-top:-8px;margin-bottom:-8px}
-  .mini{width:36px;height:36px;border-radius:50%;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--card-2);border:1px solid var(--border);color:var(--accent);box-shadow:none}
+  .mini{width:36px;height:36px;border-radius:50%;padding:0;display:inline-flex;align-items:center;justify-content:center;background:var(--card-2);border:1px solid var(--border);color:var(--accent);box-shadow:none;text-decoration:none;cursor:pointer;transition:transform .15s ease,background .2s ease}
   .mini svg{width:18px;height:18px}
   .mini:active{background:var(--orange);color:var(--on-orange);transform:scale(.92)}
   .stat{display:block;text-align:center;padding:10px 6px 9px;border-radius:16px}
@@ -742,22 +742,19 @@ function toast(msg){
   t.textContent = msg; t.classList.add('on');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('on'), 2400);
 }
-// Calendario: su Android usa l'intent esplicito su content://com.android.calendar/events per aprire subito
-// l'app Calendario predefinita (Google Calendar / Calendario di sistema) con tutti i campi già pronti;
-// su iPhone apre la schermata "Aggiungi al calendario"; sul computer scarica il file .ics.
+// Genera l'URI intent nativo per Android (usato direttamente sull'<a href="..."> per evitare blocchi di Chrome)
+function linkCalendarioAndroid(p){
+  const d = dettagliPartita(p), enc = encodeURIComponent;
+  const gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + enc(d.titolo)
+    + '&dates=' + dataIcs(d.ini) + '/' + dataIcs(d.fine) + '&details=' + enc(d.note) + '&location=' + enc(d.luogo);
+  return 'intent://com.android.calendar/events#Intent;scheme=content;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;'
+    + 'S.title=' + enc(d.titolo) + ';S.eventLocation=' + enc(d.luogo) + ';S.description=' + enc(d.note) + ';'
+    + 'l.beginTime=' + d.ini.getTime() + ';l.endTime=' + d.fine.getTime() + ';'
+    + 'S.browser_fallback_url=' + enc(gcal) + ';end';
+}
+// Calendario su iPhone e computer (su Android ci pensa direttamente il tag <a href="intent://..."> toccato dall'utente)
 function aggiungiAlCalendario(p){
   const d = dettagliPartita(p), enc = encodeURIComponent;
-  if (ANDROID && !IN_APP){
-    const intent = 'intent://com.android.calendar/events#Intent;scheme=content;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/event;'
-      + 'S.title=' + enc(d.titolo) + ';S.eventLocation=' + enc(d.luogo) + ';S.description=' + enc(d.note) + ';'
-      + 'l.beginTime=' + d.ini.getTime() + ';l.endTime=' + d.fine.getTime() + ';end';
-    const a = document.createElement('a');
-    a.href = intent;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    return;
-  }
   const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Fenice Roma Pallavolo//Calendario//IT', 'BEGIN:VEVENT',
     'UID:' + chiaveDi(p) + '@calendario-fenice', 'DTSTAMP:' + dataIcs(new Date()),
     'DTSTART:' + dataIcs(d.ini), 'DTEND:' + dataIcs(d.fine), 'SUMMARY:' + escIcs(d.titolo),
@@ -774,9 +771,9 @@ async function condividiPartita(p){
   const giorno = d.ini.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
   const url = location.href.split('#')[0];
   const testoCompleto = d.titolo + '\n📅 ' + giorno + ' · ' + p.Ora + (p.Via ? '\n📍 ' + p.Via : '') + '\n🔗 ' + url;
-  // Passando solo title e text (con il link già dentro al testo, senza la proprietà "url" separata),
-  // Chrome su Android salta il pannello intermedio di Chrome e apre direttamente la schermata di condivisione
-  // principale del sistema con WhatsApp, Instagram, Gmail, ecc.
+  // Passando solo { text } (senza "url" separato), Android/ColorOS apre direttamente il selettore
+  // di sistema completo (WhatsApp, Instagram, Condividi nelle vicinanze, OPPO Share, ecc.)
+  // invece del mini-pannello di Chrome con "Screenshot lungo / Codice QR / Altro".
   if (navigator.share){ try{ await navigator.share({ title:'Partita Fenice', text:testoCompleto }); }catch(e){} return; }
   try{ await navigator.clipboard.writeText(testoCompleto); toast('Testo copiato negli appunti'); }
   catch(e){ toast('Condivisione non disponibile su questo browser'); }
@@ -786,7 +783,13 @@ document.addEventListener('click', e => {
   if (!b) return;
   const p = partiteCache.find(x => String(x.rigaExcel) === (b.dataset.ics || b.dataset.share));
   if (!p) return;
-  if (b.dataset.ics) aggiungiAlCalendario(p); else condividiPartita(p);
+  if (b.dataset.ics){
+    if (ANDROID && !IN_APP) return; // Lascia seguire nativamente l'attributo href="intent://..." del tag <a>
+    e.preventDefault();
+    aggiungiAlCalendario(p);
+  } else {
+    condividiPartita(p);
+  }
 });
 
 function etichettaGiorno(g){
@@ -912,7 +915,7 @@ function disegnaLista(){
         <span class="pill ${inCasa ? 'casa' : 'fuori'}">${inCasa ? 'IN CASA' : 'FUORI CASA'}</span>
         ${esito ? `<span class="esito ${esito}">${esito === 'win' ? 'VITTORIA' : 'SCONFITTA'}</span>` : ''}
         ${p.Gara ? `<span>· Gara ${escapeHtml(p.Gara)}</span>` : ''}
-        <span class="mini-grp"><button type="button" class="mini" data-ics="${p.rigaExcel}" aria-label="Aggiungi al calendario" title="Aggiungi al calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg></button><button type="button" class="mini" data-share="${p.rigaExcel}" aria-label="Condividi" title="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button></span>
+        <span class="mini-grp"><a class="mini" href="${ANDROID && !IN_APP ? linkCalendarioAndroid(p) : '#'}" data-ics="${p.rigaExcel}" aria-label="Aggiungi al calendario" title="Aggiungi al calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg></a><button type="button" class="mini" data-share="${p.rigaExcel}" aria-label="Condividi" title="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button></span>
         ${p.Via ? `<a class="via" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.Via)}" target="_blank" rel="noopener"><span>📍 ${escapeHtml(p.Via)}</span><em aria-label="Apri la mappa"><small>Mappa</small> ↗</em></a>` : ''}
       </div>
       ${adminHtml}
@@ -1305,8 +1308,15 @@ document.addEventListener('change', e => {
   if (sel) updateDoc(doc(db,'utenti',sel.dataset.uid), { ruolo: sel.value }).catch(() => alert('Ruolo non modificato.'));
 });
 
-// Service worker: apertura più veloce e ultimo calendario disponibile anche senza rete
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+// Aggiornamento automatico Service Worker e pulizia vecchia cache HTML per evitare che il telefono mostri versioni vecchie
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' });
+      reg.update();
+    } catch(e) {}
+  });
+}
 
 leggiFoglioGoogle(true);
 setInterval(() => leggiFoglioGoogle(false), 5000);
