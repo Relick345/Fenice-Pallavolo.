@@ -1,4 +1,5 @@
 {
+  "id": "./",
   "name": "Fenice Roma Pallavolo · Calendario partite",
   "short_name": "Fenice",
   "description": "Calendario ufficiale delle partite di Fenice Roma Pallavolo",
@@ -33,5 +34,8 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "categories": [
+    "sports"
   ]
 }
