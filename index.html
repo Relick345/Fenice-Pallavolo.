@@ -232,6 +232,11 @@
   .cl-sync{font-size:.74rem;color:var(--text-soft);display:flex;align-items:center;gap:6px}
   .cl-sync .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex:none}
   .cl-sync.off .dot{background:var(--text-soft)}
+  .cl-sync.warn .dot{background:#e8a013;box-shadow:0 0 8px rgba(232,160,19,.55)}
+  .cl-sync.busy .dot{background:var(--orange);animation:cl-pulse 1s ease-in-out infinite}
+  @keyframes cl-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.45}}
+  #cl-refresh.spin{animation:cl-spin 1s linear infinite}
+  @keyframes cl-spin{to{transform:rotate(360deg)}}
   .cl-wrap{border:1px solid var(--border);border-radius:14px;overflow:clip;background:var(--card)}
   table.cl{width:100%;border-collapse:collapse;font-size:.84rem}
   .cl thead th{position:sticky;top:0;z-index:2;background:var(--card-2);color:var(--text-soft);font-size:.62rem;letter-spacing:1px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border);text-align:center}
@@ -1406,15 +1411,16 @@ const CAT_GIRONI = [
   {cat:"Serie D Regionale M", gid:"63671", label:"Serie D"}
 ];
 const GID_BY_CAT = Object.fromEntries(CAT_GIRONI.map(x => [x.cat, x.gid]));
-const FIPAV_PROXIES = [
-  u => u,
+const FIPAV_RELAYS = [
   u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u),
   u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u),
+  u => "https://api.allorigins.win/get?url=" + encodeURIComponent(u),
   u => "https://api.cors.lol/?url=" + encodeURIComponent(u),
   u => "https://test.cors.workers.dev/?" + u,
   u => "https://cors.eu.org/" + u
 ];
-let fipavProxy = -1; try{ fipavProxy = parseInt(localStorage.getItem('fenice-fipav-proxy') ?? '-1', 10); }catch(e){}
+const FIPAV_RELAY_PARSE = [null, null, j => { try{ return JSON.parse(j.contents); }catch(e){ return null; } }, null, null, null];
+let fipavEsc = false, fipavLastTry = 0, fipavLastOk = 0, fipavFailStreak = 0, fipavRetryTimer = 0;
 let fipavDB = null;
 try{ const c = JSON.parse(localStorage.getItem('fenice-fipav-db') || 'null'); if (c && c.syncedAt > FIPAV_SNAPSHOT.syncedAt && c.gironi) fipavDB = c; }catch(e){}
 if (!fipavDB) fipavDB = {syncedAt:FIPAV_SNAPSHOT.syncedAt, source:'snapshot', gironi:FIPAV_SNAPSHOT.gironi};
@@ -1473,11 +1479,22 @@ document.addEventListener('keydown', e => {
 
 /* --- pannello classifiche --- */
 function clSyncRiga(){
-  const el = $('cl-sync'), live = fipavDB.source === 'live';
-  el.classList.toggle('off', !live);
-  const d = new Date(fipavDB.syncedAt * 1000);
-  el.querySelector('span').textContent = (live ? 'In diretta da FIPAV · ' : 'Dati FIPAV del ') +
-    d.toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}) + ' ' + d.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+  const el = $('cl-sync'); if (!el) return;
+  const span = el.querySelector('span');
+  const hm = t => new Date(t * 1000).toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+  const dm = t => new Date(t * 1000).toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'});
+  el.classList.remove('off', 'warn', 'busy');
+  if (clRefreshing){ el.classList.add('busy'); span.textContent = 'Aggiornamento da FIPAV in corso…'; return; }
+  const age = Date.now() / 1000 - (fipavLastOk || fipavDB.syncedAt);
+  if (fipavDB.source !== 'snapshot' && fipavFailStreak === 0 && age < 15 * 60){
+    span.textContent = 'In diretta da FIPAV · ' + hm(fipavDB.syncedAt);
+  } else if (fipavDB.source === 'snapshot'){
+    el.classList.add('off');
+    span.textContent = 'Dati FIPAV del ' + dm(fipavDB.syncedAt) + ' ' + hm(fipavDB.syncedAt) + (fipavLastTry ? ' · ultimo tentativo ' + hm(fipavLastTry) : '') + ' · premi 🔄';
+  } else {
+    el.classList.add('warn');
+    span.textContent = 'Dati del ' + dm(fipavDB.syncedAt) + ' ' + hm(fipavDB.syncedAt) + (fipavLastTry ? ' · ultimo tentativo ' + hm(fipavLastTry) : '') + (fipavFailStreak ? ' · riprovo da solo' : '');
+  }
 }
 function disegnaClassifiche(){
   const chips = $('cl-chips'); chips.innerHTML = '';
@@ -1513,28 +1530,48 @@ document.addEventListener('click', e => {
 $('btn-classifiche').onclick = () => {
   $('sheet-classifiche').hidden = false;
   disegnaClassifiche();
-  if (Date.now() / 1000 - fipavDB.syncedAt > 300) aggiornaFipav(false);
+  if (Date.now() / 1000 - fipavDB.syncedAt > 60) aggiornaFipav(false);
 };
-$('cl-refresh').onclick = () => aggiornaFipav(true);
+$('cl-refresh').onclick = () => {
+  if (clRefreshing){ toast('Aggiornamento già in corso…'); return; }
+  aggiornaFipav(true);
+};
 
-/* --- lettura live da FIPAV (con proxy di riserva se il browser blocca CORS) --- */
+/* --- lettura live da FIPAV: diretta + relay in parallelo, timeout anche sulla lettura del body --- */
+function fipavRace(items){
+  return new Promise((resolve, reject) => {
+    let left = items.length, done = false;
+    if (!left){ reject(new Error('nessun relay')); return; }
+    const ctrls = [];
+    items.forEach(item => {
+      const ctrl = new AbortController(); ctrls.push(ctrl);
+      const to = setTimeout(() => ctrl.abort(), 8000);
+      const guard = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 9000));
+      const ask = fetch(item.u, {signal:ctrl.signal, cache:'no-store'})
+        .then(r => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+        .then(j => {
+          const v = item.parse ? item.parse(j) : j;
+          if (!v || !(v.data || Array.isArray(v))) throw new Error('payload inatteso');
+          return v;
+        });
+      Promise.race([guard, ask])
+        .then(v => {
+          clearTimeout(to);
+          if (done) return;
+          done = true;
+          ctrls.forEach(c => { try{ c.abort(); }catch(e){} });
+          resolve(v);
+        })
+        .catch(() => { clearTimeout(to); left--; if (left === 0 && !done) reject(new Error('fipav non raggiungibile')); });
+    });
+  });
+}
 async function fipavFetch(url){
-  const idx = FIPAV_PROXIES.map((_, i) => i);
-  if (fipavProxy >= 0 && fipavProxy < idx.length){ idx.splice(idx.indexOf(fipavProxy), 1); idx.unshift(fipavProxy); }
-  for (const i of idx){
-    try{
-      const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 9000);
-      const r = await fetch(FIPAV_PROXIES[i](url), {signal:ctrl.signal, cache:'no-store'});
-      clearTimeout(to);
-      if (!r.ok) continue;
-      const j = await r.json();
-      if (j && (j.data || Array.isArray(j))){
-        if (fipavProxy !== i){ fipavProxy = i; try{ localStorage.setItem('fenice-fipav-proxy', String(i)); }catch(e){} }
-        return j;
-      }
-    }catch(e){}
-  }
-  throw new Error('fipav non raggiungibile');
+  try{ return await fipavRace([{u:url, parse:null}]); }catch(e){}
+  const idx = fipavEsc ? [0, 1, 2, 3, 4, 5] : [0, 1];
+  const items = idx.map(i => ({u:FIPAV_RELAYS[i](url), parse:FIPAV_RELAY_PARSE[i]}));
+  try{ const j = await fipavRace(items); fipavEsc = false; return j; }
+  catch(e){ fipavEsc = true; throw e; }
 }
 function fipavNormalizza(gid, tRes, cRes){
   const td = (Array.isArray(tRes) ? tRes[0] : tRes).data, cd = (Array.isArray(cRes) ? cRes[0] : cRes).data;
@@ -1552,27 +1589,45 @@ function fipavNormalizza(gid, tRes, cRes){
   return {id:gid, short:prev.short || gid, title:td.title, comm:td['commettee-short'] || td.commettee || prev.comm || '', giornata:cd['view-position'] || prev.giornata || '', feniceId:fen || prev.feniceId, teams, matches};
 }
 async function aggiornaFipav(manual){
-  if (clRefreshing) return; clRefreshing = true;
-  const res = await Promise.allSettled(CAT_GIRONI.map(async x => {
-    const [t, c] = await Promise.all([fipavFetch(FIPAV_API + '/tables/' + x.gid), fipavFetch(FIPAV_API + '/calendar/0/' + x.gid)]);
-    return fipavNormalizza(x.gid, t, c);
-  }));
+  if (clRefreshing){ if (manual) toast('Aggiornamento già in corso…'); return; }
+  clRefreshing = true; fipavLastTry = Math.floor(Date.now() / 1000);
+  const btn = $('cl-refresh'); if (btn) btn.classList.add('spin');
+  clSyncRiga();
   let ok = 0;
-  res.forEach((r, i) => { if (r.status === 'fulfilled'){ fipavDB.gironi[CAT_GIRONI[i].gid] = r.value; ok++; } });
-  if (ok){
-    fipavDB.syncedAt = Math.floor(Date.now() / 1000);
-    fipavDB.source = ok === CAT_GIRONI.length ? 'live' : 'partial';
-    try{ localStorage.setItem('fenice-fipav-db', JSON.stringify(fipavDB)); }catch(e){}
+  try{
+    const res = await Promise.allSettled(CAT_GIRONI.map(async x => {
+      const [t, c] = await Promise.all([fipavFetch(FIPAV_API + '/tables/' + x.gid), fipavFetch(FIPAV_API + '/calendar/0/' + x.gid)]);
+      return fipavNormalizza(x.gid, t, c);
+    }));
+    res.forEach((r, i) => { if (r.status === 'fulfilled'){ fipavDB.gironi[CAT_GIRONI[i].gid] = r.value; ok++; } });
+    if (ok){
+      fipavDB.syncedAt = Math.floor(Date.now() / 1000);
+      fipavDB.source = ok === CAT_GIRONI.length ? 'live' : 'partial';
+      fipavFailStreak = 0; fipavLastOk = fipavDB.syncedAt;
+      try{ localStorage.setItem('fenice-fipav-db', JSON.stringify(fipavDB)); }catch(e){}
+    } else { fipavFailStreak++; }
+  }catch(e){ fipavFailStreak++; }
+  finally{
+    clRefreshing = false;
+    fipavLastTry = Math.floor(Date.now() / 1000);
+    if (btn) btn.classList.remove('spin');
+    applicaFipav();
+    const occupato = rigaInModifica !== null || modificaOrdine || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName));
+    if (!occupato) disegnaLista();
+    if (!$('sheet-classifiche').hidden) disegnaClassifiche(); else clSyncRiga();
+    if (manual) toast(ok ? 'Classifiche e risultati aggiornati (' + ok + '/4)' : 'FIPAV non raggiungibile: uso gli ultimi dati, riprovo tra poco');
+    clearTimeout(fipavRetryTimer);
+    if (!ok) fipavRetryTimer = setTimeout(() => aggiornaFipav(false), 20000);
   }
-  clRefreshing = false;
-  applicaFipav();
-  const occupato = rigaInModifica !== null || modificaOrdine || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName));
-  if (!occupato) disegnaLista();
-  if (!$('sheet-classifiche').hidden) disegnaClassifiche();
-  if (manual) toast(ok ? 'Classifiche e risultati aggiornati (' + ok + '/4)' : 'FIPAV non raggiungibile: uso gli ultimi dati');
 }
-setInterval(() => aggiornaFipav(false), 5 * 60 * 1000);
+setInterval(() => aggiornaFipav(false), 60 * 1000);
+setInterval(() => { if (!$('sheet-classifiche').hidden) clSyncRiga(); }, 30000);
 setTimeout(() => aggiornaFipav(false), 1500);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && Date.now() / 1000 - fipavLastTry > 20) aggiornaFipav(false);
+});
+window.addEventListener('online', () => aggiornaFipav(false));
+window.addEventListener('focus', () => { if (Date.now() / 1000 - fipavLastTry > 60) aggiornaFipav(false); });
 
 leggiFoglioGoogle(true);
 setInterval(() => leggiFoglioGoogle(false), 5000);
