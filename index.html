@@ -226,6 +226,68 @@
   .utente-row em{font-size:.74rem;font-style:normal;font-weight:800;color:var(--accent)}
   .utente-row select{padding:8px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:var(--card);color:var(--text)}
 
+  /* ===== Classifiche FIPAV + set automatici ===== */
+  #btn-classifiche svg{width:19px;height:19px;display:block}
+  .cl-chips{display:flex;gap:8px;flex-wrap:wrap}
+  .cl-sync{font-size:.74rem;color:var(--text-soft);display:flex;align-items:center;gap:6px}
+  .cl-sync .dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex:none}
+  .cl-sync.off .dot{background:var(--text-soft)}
+  .cl-wrap{border:1px solid var(--border);border-radius:14px;overflow:clip;background:var(--card)}
+  table.cl{width:100%;border-collapse:collapse;font-size:.84rem}
+  .cl thead th{position:sticky;top:0;z-index:2;background:var(--card-2);color:var(--text-soft);font-size:.62rem;letter-spacing:1px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border);text-align:center}
+  .cl thead th:nth-child(2){text-align:left}
+  .cl td{padding:9px 6px;border-bottom:1px solid var(--border);text-align:center;font-variant-numeric:tabular-nums}
+  .cl tr:last-child td{border-bottom:none}
+  .cl .cl-row{cursor:pointer}
+  .cl .cl-row:hover{background:var(--card-2)}
+  .cl .cl-row.fen{background:var(--card-2);box-shadow:inset 4px 0 0 var(--orange)}
+  .cl .cl-row.fen .nm span{color:var(--accent);font-weight:900}
+  .cl .pos{font-weight:900;color:var(--text-soft);width:28px}
+  .cl .nm{text-align:left}
+  .cl .nm .in{display:flex;align-items:center;gap:7px;min-width:0}
+  .cl .nm img{width:20px;height:20px;border-radius:50%;object-fit:contain;background:#fff;border:1px solid var(--border);flex:none}
+  .cl .nm span{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+  @media(min-width:520px){.cl .nm span{max-width:250px}}
+  .cl .pts{font-weight:900}
+  .cl .gp{color:var(--text-soft);font-size:.76rem;white-space:nowrap}
+  .cl-det td{padding:0!important;background:var(--bg)}
+  .cl-det .grid{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s ease}
+  .cl-det.open .grid{grid-template-rows:1fr}
+  .cl-det .in2{overflow:hidden;min-height:0}
+  .cl-det .pad{display:flex;flex-wrap:wrap;gap:5px 14px;padding:9px 12px;font-size:.74rem;color:var(--text-soft)}
+  .cl-det .pad b{color:var(--text)}
+  .cl-det .full{flex-basis:100%;font-weight:800;color:var(--text)}
+  .cl-legend{display:flex;flex-wrap:wrap;gap:4px 12px;padding:8px 12px;font-size:.64rem;color:var(--text-soft);background:var(--card-2);border-top:1px solid var(--border)}
+  .cl-legend b{color:var(--accent)}
+  .cl-note{font-size:.72rem;color:var(--text-soft)}
+  .score .ris.tap-set{cursor:pointer}
+  .set-panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s ease;margin:0 14px}
+  .set-panel.open{grid-template-rows:1fr}
+  .set-panel>.in{overflow:hidden;min-height:0}
+  .set-inner{border-top:1px dashed var(--border);padding:10px 0 12px}
+  .set-label{font-size:.6rem;font-weight:900;letter-spacing:1.4px;color:var(--text-soft);text-transform:uppercase;margin-bottom:7px}
+  .set-cells{display:grid;grid-template-columns:repeat(auto-fit,minmax(62px,1fr));gap:6px}
+  .set-cell{border-radius:11px;padding:6px 4px;text-align:center;border:1px solid var(--border);background:var(--card-2)}
+  .set-cell small{display:block;font-size:.55rem;font-weight:900;letter-spacing:1px;color:var(--text-soft);margin-bottom:2px}
+  .set-cell b{font-size:.9rem;font-weight:900;font-variant-numeric:tabular-nums}
+  .set-cell.v{background:#d4edda;border-color:var(--green)} .set-cell.v b{color:#155724}
+  .set-cell.p{background:#f8d7da;border-color:var(--red)} .set-cell.p b{color:#721c24}
+  :root[data-theme="dark"] .set-cell.v{background:rgba(40,167,69,.16)} :root[data-theme="dark"] .set-cell.v b{color:#7dd89a}
+  :root[data-theme="dark"] .set-cell.p{background:rgba(226,59,43,.16)} :root[data-theme="dark"] .set-cell.p b{color:#ff9d94}
+  .set-tot{margin-top:7px;font-size:.72rem;color:var(--text-soft);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+  .set-tot b{color:var(--text)}
+  .set-fipav{display:inline-block;margin-top:6px;font-size:.72rem;font-weight:700;color:var(--accent)}
+  .auto-src{color:var(--text-soft);font-size:.68rem;font-weight:700}
+  .mini.set-on{background:var(--orange);color:var(--on-orange);border-color:var(--orange)}
+  @media(max-width:360px){
+    .cl{font-size:.78rem}
+    .cl td,.cl thead th{padding:7px 3px}
+    .cl .nm img{display:none}
+    .cl .nm span{max-width:34vw}
+    .cl .gp{font-size:.7rem}
+    .cl-legend{font-size:.6rem;gap:3px 8px}
+  }
+
   /* ===== Ottimizzazione telefono v2 ===== */
   body{position:relative;padding-bottom:calc(32px + env(safe-area-inset-bottom,0px));-webkit-tap-highlight-color:transparent}
   button,.chip{touch-action:manipulation}
@@ -360,6 +422,7 @@
 <div class="top-bar">
   <span id="user-status" class="status-badge">Modalità Visitatore (Sola lettura)</span>
   <div id="auth-actions">
+    <button id="btn-classifiche" class="btn-theme" title="Classifiche dei campionati" aria-label="Apri le classifiche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <button id="btn-theme" class="btn-theme" title="Cambia tema chiaro/scuro">🌙</button>
     <button id="btn-login" class="btn-primary">🔐 Accedi per modificare</button>
     <div id="pin-section" style="display:none;align-items:center;gap:5px;">
@@ -433,6 +496,18 @@
   <div class="sheet-card">
     <div class="sheet-head"><h3>Installa l’app</h3><button data-chiudi aria-label="Chiudi">✕</button></div>
     <div class="sheet-body" id="inst-body"></div>
+  </div>
+</div>
+
+<div id="sheet-classifiche" class="sheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h3>🏆 Classifiche FIPAV</h3><button id="cl-refresh" title="Aggiorna adesso" aria-label="Aggiorna classifiche">🔄</button><button data-chiudi aria-label="Chiudi">✕</button></div>
+    <div class="sheet-body">
+      <div class="cl-chips" id="cl-chips"></div>
+      <div class="cl-sync" id="cl-sync"><i class="dot"></i><span>…</span></div>
+      <div id="cl-tabella"></div>
+      <p class="cl-note">Tocca una squadra per vedere set vinti/persi e quozienti. Dati ufficiali FIPAV Online, aggiornati in automatico.</p>
+    </div>
   </div>
 </div>
 
@@ -689,7 +764,7 @@ const DUE_GIORNI = 2 * 864e5;
 const chiavePartita = (c,g,d,a) => [c,g,d,a].map(x => (x||'').toString().trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'')).join('__');
 const chiaveDi = p => chiavePartita(p.Campionato, p.Gara, p.Giorno, p.Avversario);
 function esitoDi(p){
-  const m = (p.Risultato||'').trim().match(/^(\d+)\s*[-–:]\s*(\d+)$/);
+  const m = risDi(p).match(/^(\d+)\s*[-–:]\s*(\d+)$/);
   if (!m) return null;
   const inCasa = p.Luogo === 'In casa';
   const noi = parseInt(inCasa ? m[1] : m[2]), loro = parseInt(inCasa ? m[2] : m[1]);
@@ -698,7 +773,7 @@ function esitoDi(p){
 // "Gia' giocata" = ha il risultato e sono passati 2 giorni da quando e' stato inserito
 // (se non so quando e' stato inserito, conto dal giorno della partita)
 function giaGiocata(p){
-  if (!(p.Risultato||'').trim()) return false;
+  if (!risDi(p)) return false;
   const base = tsRisultati[chiaveDi(p)] || parseDataOra(p.Giorno, p.Ora).getTime();
   return Date.now() >= base + DUE_GIORNI;
 }
@@ -806,6 +881,7 @@ function etichettaGiorno(g){
 function disegnaLista(){
   const cont = document.getElementById('lista-partite');
   cont.innerHTML = "";
+  applicaFipav();
 
   let elenco = partiteCache.slice();
 
@@ -828,7 +904,7 @@ function disegnaLista(){
   const attive = elenco.filter(p => !giaGiocata(p));
   const prossima = attive.find(p => !partitaPassata(p));
   const vinte = elenco.filter(p => esitoDi(p) === 'win').length, perse = elenco.filter(p => esitoDi(p) === 'loss').length;
-  const daGiocare = elenco.filter(p => !(p.Risultato||'').trim() && !partitaPassata(p)).length;
+  const daGiocare = elenco.filter(p => !risDi(p) && !partitaPassata(p)).length;
   const stats = document.createElement('div');
   stats.className = 'stats';
   stats.innerHTML = `<div class="stat"><b>${daGiocare}</b><span>Da giocare</span></div><div class="stat v"><b>${vinte}</b><span>Vinte</span></div><div class="stat p"><b>${perse}</b><span>Perse</span></div>`;
@@ -879,14 +955,14 @@ function disegnaLista(){
     const NOI = 'FENICE';   // solo "Fenice": Roma Pallavolo e' sottinteso, cosi' sta anche su schermi stretti
     const squadraCasa = inCasa ? NOI : p.Avversario;
     const squadraTrasferta = inCasa ? p.Avversario : NOI;
-    const ris = (p.Risultato || "").trim();
+    const ris = risDi(p);
     const daSegnare = partitaPassata(p) && !ris;
     const esito = esitoDi(p);
     if (giaGiocata(p)) card.classList.add('giocata');
     if (p === prossima) card.classList.add('next');
 
     const scoreHtml = ris
-      ? `<div class="ris ${esito || ''}">${escapeHtml(ris)}</div>`
+      ? `<div class="ris ${esito || ''}${p._sets ? ' tap-set' : ''}"${p._sets ? ` data-set="${p.rigaExcel}" role="button" tabindex="0" title="Tocca per vedere i singoli set"` : ''}>${escapeHtml(ris)}</div>`
       : `<div class="vs">VS</div>${daSegnare ? '<span class="tag-passata">DA SEGNARE</span>' : ''}`;
 
     let adminHtml = '';
@@ -914,10 +990,12 @@ function disegnaLista(){
       <div class="match-bottom">
         <span class="pill ${inCasa ? 'casa' : 'fuori'}">${inCasa ? 'IN CASA' : 'FUORI CASA'}</span>
         ${esito ? `<span class="esito ${esito}">${esito === 'win' ? 'VITTORIA' : 'SCONFITTA'}</span>` : ''}
+        ${!((p.Risultato||'').trim()) && p._autoRis ? '<span class="auto-src">· da FIPAV</span>' : ''}
         ${p.Gara ? `<span>· Gara ${escapeHtml(p.Gara)}</span>` : ''}
-        <span class="mini-grp"><a class="mini" href="${ANDROID && !IN_APP ? linkCalendarioAndroid(p) : '#'}" data-ics="${p.rigaExcel}" aria-label="Aggiungi al calendario" title="Aggiungi al calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg></a><button type="button" class="mini" data-share="${p.rigaExcel}" aria-label="Condividi" title="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button></span>
+        <span class="mini-grp"><a class="mini" href="${ANDROID && !IN_APP ? linkCalendarioAndroid(p) : '#'}" data-ics="${p.rigaExcel}" aria-label="Aggiungi al calendario" title="Aggiungi al calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18M12 13v5M9.5 15.5h5"/></svg></a><button type="button" class="mini" data-share="${p.rigaExcel}" aria-label="Condividi" title="Condividi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>${p._sets ? `<button type="button" class="mini${expandedSets.has(String(p.rigaExcel)) ? ' set-on' : ''}" data-set="${p.rigaExcel}" aria-label="Dettaglio set" title="Vedi i singoli set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg></button>` : ''}</span>
         ${p.Via ? `<a class="via" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.Via)}" target="_blank" rel="noopener"><span>📍 ${escapeHtml(p.Via)}</span><em aria-label="Apri la mappa"><small>Mappa</small> ↗</em></a>` : ''}
       </div>
+      ${p._sets ? setPanelHtml(p) : ''}
       ${adminHtml}
     `;
     cont.appendChild(card);
@@ -1317,6 +1395,184 @@ if ('serviceWorker' in navigator) {
     } catch(e) {}
   });
 }
+
+/* ======= Classifiche FIPAV + risultati e set automatici ======= */
+const FIPAV_SNAPSHOT = {"syncedAt":1795035257,"gironi":{"64316":{"id":"64316","short":"Under 15","title":"Under 15 Maschile ELITE  - Gir. B","comm":"C.T. ROMA","giornata":"Giornata 3","feniceId":"231916","teams":[{"id":"234239","title":"MARINO PALLAVOLO BULLS","logo":"https://app.fipavonline.it/img/loghi_societa/120600310/logo.jpg?v=1761218063","pos":1,"p":"6","g":"2","gv":"2","gp":"0","sv":"6","sp":"0","pf":"151","ps":"116","qs":"100","qp":"1.3017"},{"id":"231916","title":"SIR FENICE ROMA","logo":"https://app.fipavonline.it/img/loghi_societa/120601261/logo.jpg?v=1726821629","pos":2,"p":"6","g":"3","gv":"2","gp":"1","sv":"6","sp":"4","pf":"237","ps":"202","qs":"1.5000","qp":"1.1733"},{"id":"233153","title":"APPIO ROMA PALLAVOLO","logo":"https://app.fipavonline.it/img/loghi_societa/120600199/logo.jpg?v=1536907216","pos":3,"p":"3","g":"2","gv":"1","gp":"1","sv":"4","sp":"3","pf":"148","ps":"136","qs":"1.3333","qp":"1.0882"},{"id":"232272","title":"ROMA 7 VOLLEY ROSSA","logo":"https://app.fipavonline.it/img/loghi_societa/120600730/logo.png?v=1538815937","pos":4,"p":"3","g":"3","gv":"1","gp":"2","sv":"4","sp":"7","pf":"241","ps":"245","qs":"0.5714","qp":"0.9837"},{"id":"232964","title":"BCC COLLI ALBANI VOLLEY SCHOOL GENZANO","logo":"https://app.fipavonline.it/img/loghi_societa/120600702/logo.png?v=1552406848","pos":5,"p":"0","g":"2","gv":"0","gp":"2","sv":"0","sp":"6","pf":"72","ps":"150","qs":"0.0000","qp":"0.4800"}],"matches":[{"id":"12990319","ng":"306","ts":1793203200,"played":true,"t1":"BCC COLLI ALBANI VOLLEY SCHOOL GENZANO","t2":"SIR FENICE ROMA","s1":0,"s2":3,"pa":[11,8,14],"pb":[25,25,25]},{"id":"12990326","ng":"313","ts":1794740400,"played":true,"t1":"SIR FENICE ROMA","t2":"MARINO PALLAVOLO BULLS","s1":0,"s2":3,"pa":[22,24,19],"pb":[25,26,25]},{"id":"12990328","ng":"315","ts":1795017600,"played":true,"t1":"ROMA 7 VOLLEY ROSSA","t2":"SIR FENICE ROMA","s1":1,"s2":3,"pa":[20,24,25,24],"pb":[25,26,20,26]},{"id":"12990332","ng":"319","ts":1795950000,"played":false,"t1":"SIR FENICE ROMA","t2":"APPIO ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990334","ng":"321","ts":1796547600,"played":false,"t1":"SIR FENICE ROMA","t2":"BCC COLLI ALBANI VOLLEY SCHOOL GENZANO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990341","ng":"328","ts":1797762600,"played":false,"t1":"MARINO PALLAVOLO BULLS","t2":"SIR FENICE ROMA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990343","ng":"330","ts":1799578800,"played":false,"t1":"SIR FENICE ROMA","t2":"ROMA 7 VOLLEY ROSSA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990347","ng":"334","ts":1800113400,"played":false,"t1":"APPIO ROMA PALLAVOLO","t2":"SIR FENICE ROMA","s1":0,"s2":0,"pa":[],"pb":[]}]},"64314":{"id":"64314","short":"Under 14","title":"Under 14 Maschile ELITE  - Gir. B","comm":"C.T. ROMA","giornata":"Giornata 3","feniceId":"231918","teams":[{"id":"232276","title":"ROMA 7 VOLLEY","logo":"https://app.fipavonline.it/img/loghi_societa/120600730/logo.png?v=1538815937","pos":1,"p":"9","g":"3","gv":"3","gp":"0","sv":"9","sp":"1","pf":"247","ps":"160","qs":"9.0000","qp":"1.5438"},{"id":"233173","title":"ASD KK VOLLEY ROMA","logo":"https://app.fipavonline.it/img/loghi_societa/120600869/logo.png?v=1765315765","pos":2,"p":"3","g":"2","gv":"1","gp":"1","sv":"3","sp":"3","pf":"126","ps":"107","qs":"1.0000","qp":"1.1776"},{"id":"233602","title":"MARINO PALLAVOLO BULLS","logo":"https://app.fipavonline.it/img/loghi_societa/120600310/logo.jpg?v=1761218063","pos":3,"p":"3","g":"2","gv":"1","gp":"1","sv":"3","sp":"3","pf":"126","ps":"131","qs":"1.0000","qp":"0.9618"},{"id":"231918","title":"SIR FENICE ROMA","logo":"https://app.fipavonline.it/img/loghi_societa/120601261/logo.jpg?v=1726821629","pos":4,"p":"0","g":"2","gv":"0","gp":"2","sv":"1","sp":"6","pf":"114","ps":"172","qs":"0.1667","qp":"0.6628"},{"id":"233324","title":"AFROGIRO VOLLEY","logo":"https://app.fipavonline.it/img/loghi_societa/120600968/logo.jpg?v=1711050522","pos":5,"p":"0","g":"1","gv":"0","gp":"1","sv":"0","sp":"3","pf":"32","ps":"75","qs":"0.0000","qp":"0.4267"}],"matches":[{"id":"12990262","ng":"249","ts":1794128400,"played":true,"t1":"SIR FENICE ROMA","t2":"MARINO PALLAVOLO BULLS","s1":0,"s2":3,"pa":[14,21,21],"pb":[25,25,25]},{"id":"12990266","ng":"253","ts":1794731400,"played":true,"t1":"SIR FENICE ROMA","t2":"ROMA 7 VOLLEY","s1":1,"s2":3,"pa":[12,25,13,8],"pb":[25,22,25,25]},{"id":"12990268","ng":"255","ts":1795335300,"played":false,"t1":"ASD KK VOLLEY ROMA","t2":"SIR FENICE ROMA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990272","ng":"259","ts":1795941000,"played":false,"t1":"SIR FENICE ROMA","t2":"AFROGIRO VOLLEY","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990277","ng":"264","ts":1797087600,"played":false,"t1":"MARINO PALLAVOLO BULLS","t2":"SIR FENICE ROMA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990281","ng":"268","ts":1797755400,"played":false,"t1":"ROMA 7 VOLLEY","t2":"SIR FENICE ROMA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990283","ng":"270","ts":1799569800,"played":false,"t1":"SIR FENICE ROMA","t2":"ASD KK VOLLEY ROMA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12990287","ng":"274","ts":1800174600,"played":false,"t1":"AFROGIRO VOLLEY","t2":"SIR FENICE ROMA","s1":0,"s2":0,"pa":[],"pb":[]}]},"64604":{"id":"64604","short":"2Div","title":"Seconda Divisione Maschile  - Gir. C","comm":"C.T. ROMA","giornata":"Giornata 1","feniceId":"231909","teams":[{"id":"230562","title":"EMMECIQUADRO","logo":"https://app.fipavonline.it/img/loghi_societa/120601282/logo.jpg?v=1602409781","pos":1,"p":"3","g":"1","gv":"1","gp":"0","sv":"3","sp":"0","pf":"75","ps":"53","qs":"100","qp":"1.4151"},{"id":"231802","title":"STREET VOLLEY CASSIA U19","logo":"https://app.fipavonline.it/img/loghi_societa/120601478/logo.jpg?v=1695127682","pos":2,"p":"3","g":"1","gv":"1","gp":"0","sv":"3","sp":"0","pf":"75","ps":"53","qs":"100","qp":"1.4151"},{"id":"234842","title":"LDM COLLE DEGLI ULIVI","logo":"https://app.fipavonline.it/img/loghi_societa/120600599/logo.png?v=1533201233","pos":3,"p":"3","g":"1","gv":"1","gp":"0","sv":"3","sp":"0","pf":"78","ps":"64","qs":"100","qp":"1.2188"},{"id":"232289","title":"ASD PALLAVOLO POGGIO MIRTETO","logo":"https://app.fipavonline.it/img/loghi_societa/120590041/logo.jpg?v=1573906578","pos":4,"p":"3","g":"1","gv":"1","gp":"0","sv":"3","sp":"1","pf":"92","ps":"76","qs":"3.0000","qp":"1.2105"},{"id":"228726","title":"ASTROLABIO 2000","logo":"https://app.fipavonline.it/img/loghi_societa/120600576/logo.jpg?v=1533054003","pos":5,"p":"3","g":"1","gv":"1","gp":"0","sv":"3","sp":"1","pf":"97","ps":"98","qs":"3.0000","qp":"0.9898"},{"id":"231639","title":"TECNOMILL CASTEL MADAMA VOLLEY","logo":"https://app.fipavonline.it/img/loghi_societa/120601238/logo.jpg?v=1729522783","pos":6,"p":"2","g":"1","gv":"1","gp":"0","sv":"3","sp":"2","pf":"91","ps":"101","qs":"1.5000","qp":"0.9010"},{"id":"232212","title":"PARIOLI AVOGADRO","logo":"https://app.fipavonline.it/img/loghi_societa/120601106/logo.png?v=1792421090","pos":7,"p":"1","g":"1","gv":"0","gp":"1","sv":"2","sp":"3","pf":"101","ps":"91","qs":"0.6667","qp":"1.1099"},{"id":"232061","title":"SEMPIONE PALLAVOLO","logo":"https://app.fipavonline.it/img/loghi_societa/120600573/logo.jpg?v=1533054003","pos":8,"p":"0","g":"1","gv":"0","gp":"1","sv":"1","sp":"3","pf":"98","ps":"97","qs":"0.3333","qp":"1.0103"},{"id":"234694","title":"ASD ROMA 3 VBC","logo":"https://app.fipavonline.it/img/loghi_societa/120601391/logo.jpg?v=1548677787","pos":9,"p":"0","g":"1","gv":"0","gp":"1","sv":"1","sp":"3","pf":"76","ps":"92","qs":"0.3333","qp":"0.8261"},{"id":"234973","title":"AFROGIRO VOLLEY","logo":"https://app.fipavonline.it/img/loghi_societa/120600968/logo.jpg?v=1711050522","pos":10,"p":"0","g":"1","gv":"0","gp":"1","sv":"0","sp":"3","pf":"64","ps":"78","qs":"0.0000","qp":"0.8205"},{"id":"231633","title":"ASD ANDREA DORIA PALLAVOLO","logo":"https://app.fipavonline.it/img/loghi_societa/120600187/logo.jpg?v=1533054003","pos":11,"p":"0","g":"1","gv":"0","gp":"1","sv":"0","sp":"3","pf":"53","ps":"75","qs":"0.0000","qp":"0.7067"},{"id":"231909","title":"FENICE ROMA PALLAVOLO UNDER","logo":"https://app.fipavonline.it/img/loghi_societa/120601261/logo.jpg?v=1726821629","pos":12,"p":"0","g":"1","gv":"0","gp":"1","sv":"0","sp":"3","pf":"53","ps":"75","qs":"0.0000","qp":"0.7067"}],"matches":[{"id":"13025606","ng":"3573","ts":1794760200,"played":true,"t1":"STREET VOLLEY CASSIA U19","t2":"FENICE ROMA PALLAVOLO UNDER","s1":3,"s2":0,"pa":[25,25,25],"pb":[18,22,13]},{"id":"13025609","ng":"3576","ts":1795357800,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"PARIOLI AVOGADRO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025618","ng":"3585","ts":1795962600,"played":false,"t1":"LDM COLLE DEGLI ULIVI","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025623","ng":"3590","ts":1796567400,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"SEMPIONE PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025628","ng":"3595","ts":1797098400,"played":false,"t1":"ASTROLABIO 2000","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025635","ng":"3602","ts":1797777000,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"TECNOMILL CASTEL MADAMA VOLLEY","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025638","ng":"3605","ts":1799591400,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"ASD PALLAVOLO POGGIO MIRTETO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025646","ng":"3613","ts":1800198000,"played":false,"t1":"AFROGIRO VOLLEY","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025653","ng":"3620","ts":1800801000,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"ASD ANDREA DORIA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025658","ng":"3625","ts":1801418400,"played":false,"t1":"ASD ROMA 3 VBC","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025666","ng":"3633","ts":1803220200,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"EMMECIQUADRO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025672","ng":"3639","ts":1803825000,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"STREET VOLLEY CASSIA U19","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025675","ng":"3642","ts":1804447800,"played":false,"t1":"PARIOLI AVOGADRO","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025684","ng":"3651","ts":1805034600,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"LDM COLLE DEGLI ULIVI","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025689","ng":"3656","ts":1805643000,"played":false,"t1":"SEMPIONE PALLAVOLO","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025694","ng":"3661","ts":1806845400,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"ASTROLABIO 2000","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025701","ng":"3668","ts":1807452000,"played":false,"t1":"TECNOMILL CASTEL MADAMA VOLLEY","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025704","ng":"3671","ts":1808056800,"played":false,"t1":"ASD PALLAVOLO POGGIO MIRTETO","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025712","ng":"3679","ts":1808659800,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"AFROGIRO VOLLEY","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025719","ng":"3686","ts":1809183600,"played":false,"t1":"ASD ANDREA DORIA PALLAVOLO","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025724","ng":"3691","ts":1809869400,"played":false,"t1":"FENICE ROMA PALLAVOLO UNDER","t2":"ASD ROMA 3 VBC","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"13025732","ng":"3699","ts":1810405800,"played":false,"t1":"EMMECIQUADRO","t2":"FENICE ROMA PALLAVOLO UNDER","s1":0,"s2":0,"pa":[],"pb":[]}]},"63671":{"id":"63671","short":"Serie D Regionale M","title":"Serie D Regionale Maschile  - Girone A","comm":"C.R. LAZIO","giornata":"Giornata 5","feniceId":"226093","teams":[{"id":"226439","title":"VOLLEY PRATI","logo":"https://app.fipavonline.it/img/loghi_societa/120600623/logo.jpg?v=1540045141","pos":1,"p":"14","g":"5","gv":"5","gp":"0","sv":"15","sp":"4","pf":"448","ps":"381","qs":"3.7500","qp":"1.1759"},{"id":"226389","title":"TOP FIVE TARQUINIA","logo":"https://app.fipavonline.it/img/loghi_societa/120610183/logo.png?v=1695297279","pos":2,"p":"13","g":"5","gv":"5","gp":"0","sv":"15","sp":"4","pf":"448","ps":"377","qs":"3.7500","qp":"1.1883"},{"id":"226551","title":"NMC HUSKIES","logo":"https://app.fipavonline.it/img/loghi_societa/120601385/logo.jpg?v=1698779152","pos":3,"p":"12","g":"5","gv":"4","gp":"1","sv":"13","sp":"3","pf":"393","ps":"310","qs":"4.3333","qp":"1.2677"},{"id":"226053","title":"ASTROLABIO 2000","logo":"https://app.fipavonline.it/img/loghi_societa/120600576/logo.jpg?v=1533054003","pos":4,"p":"10","g":"5","gv":"3","gp":"2","sv":"11","sp":"6","pf":"378","ps":"369","qs":"1.8333","qp":"1.0244"},{"id":"226371","title":"TEAM POWER ALBANO VELLETRI","logo":"https://app.fipavonline.it/img/loghi_societa/120600003/logo.jpg?v=1666898123","pos":5,"p":"9","g":"5","gv":"3","gp":"2","sv":"12","sp":"8","pf":"448","ps":"408","qs":"1.5000","qp":"1.0980"},{"id":"226361","title":"VALSUGANA PANIZZO","logo":"https://app.fipavonline.it/img/loghi_societa/120601493/logo.jpg?v=1758360261","pos":6,"p":"8","g":"5","gv":"2","gp":"3","sv":"10","sp":"9","pf":"421","ps":"398","qs":"1.1111","qp":"1.0578"},{"id":"226545","title":"DECIMO ROMA","logo":"https://app.fipavonline.it/img/loghi_societa/120601260/logo.png?v=1633945807","pos":7,"p":"6","g":"5","gv":"2","gp":"3","sv":"9","sp":"11","pf":"433","ps":"446","qs":"0.8182","qp":"0.9709"},{"id":"226468","title":"AFROGIRO VOLLEY","logo":"https://app.fipavonline.it/img/loghi_societa/120600968/logo.jpg?v=1711050522","pos":8,"p":"6","g":"5","gv":"2","gp":"3","sv":"7","sp":"10","pf":"364","ps":"391","qs":"0.7000","qp":"0.9309"},{"id":"226370","title":"TVL ANGUILLARA","logo":"https://app.fipavonline.it/img/loghi_societa/120600179/logo.jpg?v=1658509012","pos":9,"p":"6","g":"5","gv":"2","gp":"3","sv":"6","sp":"9","pf":"313","ps":"348","qs":"0.6667","qp":"0.8994"},{"id":"226089","title":"BCC COLLI ALBANI VOLLEY SCHOOL GENZANO","logo":"https://app.fipavonline.it/img/loghi_societa/120600702/logo.png?v=1552406848","pos":10,"p":"6","g":"5","gv":"2","gp":"3","sv":"6","sp":"10","pf":"347","ps":"375","qs":"0.6000","qp":"0.9253"},{"id":"226113","title":"ROMAN VOLLEY PURPLE","logo":"https://app.fipavonline.it/img/loghi_societa/120601115/logo.jpg?v=1536306865","pos":11,"p":"5","g":"5","gv":"2","gp":"3","sv":"7","sp":"12","pf":"411","ps":"427","qs":"0.5833","qp":"0.9625"},{"id":"226224","title":"SSD SAN PAOLO OSTIENSE ","logo":"https://app.fipavonline.it/img/loghi_societa/120601440/logo.png?v=1673882523","pos":12,"p":"5","g":"5","gv":"2","gp":"3","sv":"6","sp":"11","pf":"371","ps":"397","qs":"0.5455","qp":"0.9345"},{"id":"226107","title":"ROMA 7 VOLLEY G","logo":"https://app.fipavonline.it/img/loghi_societa/120600730/logo.png?v=1538815937","pos":13,"p":"4","g":"5","gv":"1","gp":"4","sv":"5","sp":"12","pf":"337","ps":"396","qs":"0.4167","qp":"0.8510"},{"id":"226093","title":"FENICE ROMA PALLAVOLO","logo":"https://app.fipavonline.it/img/loghi_societa/120601261/logo.jpg?v=1726821629","pos":14,"p":"1","g":"5","gv":"0","gp":"5","sv":"2","sp":"15","pf":"323","ps":"412","qs":"0.1333","qp":"0.7840"}],"matches":[{"id":"12933334","ng":"915","ts":1792343700,"played":true,"t1":"TEAM POWER ALBANO VELLETRI","t2":"FENICE ROMA PALLAVOLO","s1":3,"s2":0,"pa":[25,25,25],"pb":[21,17,15]},{"id":"12933342","ng":"923","ts":1792866600,"played":true,"t1":"FENICE ROMA PALLAVOLO","t2":"VALSUGANA PANIZZO","s1":0,"s2":3,"pa":[20,21,17],"pb":[25,25,25]},{"id":"12933348","ng":"929","ts":1793559600,"played":true,"t1":"ASTROLABIO 2000","t2":"FENICE ROMA PALLAVOLO","s1":3,"s2":0,"pa":[25,25,25],"pb":[18,16,23]},{"id":"12933355","ng":"936","ts":1794079800,"played":true,"t1":"FENICE ROMA PALLAVOLO","t2":"ROMA 7 VOLLEY G","s1":0,"s2":3,"pa":[18,21,21],"pb":[25,25,25]},{"id":"12933362","ng":"943","ts":1794767400,"played":true,"t1":"DECIMO ROMA","t2":"FENICE ROMA PALLAVOLO","s1":3,"s2":2,"pa":[18,29,25,25,15],"pb":[25,31,12,17,10]},{"id":"12933370","ng":"951","ts":1795363200,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"SSD SAN PAOLO OSTIENSE ","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933378","ng":"959","ts":1795892400,"played":false,"t1":"NMC HUSKIES","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933384","ng":"965","ts":1796497200,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"VOLLEY PRATI","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933390","ng":"971","ts":1797105600,"played":false,"t1":"BCC COLLI ALBANI VOLLEY SCHOOL GENZANO","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933397","ng":"978","ts":1797787800,"played":false,"t1":"TOP FIVE TARQUINIA","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933404","ng":"985","ts":1799523000,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"TVL ANGUILLARA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933413","ng":"994","ts":1800120600,"played":false,"t1":"AFROGIRO VOLLEY","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933419","ng":"1000","ts":1800732600,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"ROMAN VOLLEY PURPLE","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933425","ng":"1006","ts":1802547000,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"TEAM POWER ALBANO VELLETRI","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933433","ng":"1014","ts":1803225600,"played":false,"t1":"VALSUGANA PANIZZO","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933439","ng":"1020","ts":1803756600,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"ASTROLABIO 2000","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933446","ng":"1027","ts":1804345200,"played":false,"t1":"ROMA 7 VOLLEY G","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933453","ng":"1034","ts":1804966200,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"DECIMO ROMA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933461","ng":"1042","ts":1805563800,"played":false,"t1":"SSD SAN PAOLO OSTIENSE ","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933469","ng":"1050","ts":1806775200,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"NMC HUSKIES","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933475","ng":"1056","ts":1807461000,"played":false,"t1":"VOLLEY PRATI","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933481","ng":"1062","ts":1807984800,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"BCC COLLI ALBANI VOLLEY SCHOOL GENZANO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933488","ng":"1069","ts":1808591400,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"TOP FIVE TARQUINIA","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933495","ng":"1076","ts":1809190800,"played":false,"t1":"TVL ANGUILLARA","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933504","ng":"1085","ts":1809801000,"played":false,"t1":"FENICE ROMA PALLAVOLO","t2":"AFROGIRO VOLLEY","s1":0,"s2":0,"pa":[],"pb":[]},{"id":"12933510","ng":"1091","ts":1810492200,"played":false,"t1":"ROMAN VOLLEY PURPLE","t2":"FENICE ROMA PALLAVOLO","s1":0,"s2":0,"pa":[],"pb":[]}]}}};
+const FIPAV_API = "https://data.fipavonline.it/api/v2";
+const CAT_GIRONI = [
+  {cat:"Under 15", gid:"64316", label:"Under 15"},
+  {cat:"2Div", gid:"64604", label:"2ª Divisione"},
+  {cat:"Under 14", gid:"64314", label:"Under 14"},
+  {cat:"Serie D Regionale M", gid:"63671", label:"Serie D"}
+];
+const GID_BY_CAT = Object.fromEntries(CAT_GIRONI.map(x => [x.cat, x.gid]));
+const FIPAV_PROXIES = [
+  u => u,
+  u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u),
+  u => "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(u),
+  u => "https://api.cors.lol/?url=" + encodeURIComponent(u),
+  u => "https://test.cors.workers.dev/?" + u,
+  u => "https://cors.eu.org/" + u
+];
+let fipavProxy = -1; try{ fipavProxy = parseInt(localStorage.getItem('fenice-fipav-proxy') ?? '-1', 10); }catch(e){}
+let fipavDB = null;
+try{ const c = JSON.parse(localStorage.getItem('fenice-fipav-db') || 'null'); if (c && c.syncedAt > FIPAV_SNAPSHOT.syncedAt && c.gironi) fipavDB = c; }catch(e){}
+if (!fipavDB) fipavDB = {syncedAt:FIPAV_SNAPSHOT.syncedAt, source:'snapshot', gironi:FIPAV_SNAPSHOT.gironi};
+let clCat = CAT_GIRONI[0].gid, clRefreshing = false;
+const expandedSets = new Set(), expandedCl = new Set();
+
+function fipavMatchDi(p){
+  const gid = GID_BY_CAT[p.Campionato]; if (!gid) return null;
+  const g = fipavDB.gironi[gid]; if (!g) return null;
+  return g.matches.find(m => m.ng === String(p.Gara)) || null;
+}
+// Aggancia ogni partita del foglio al match FIPAV col stesso numero di gara:
+// il risultato automatico entra solo dove l'admin non l'ha gia' scritto a mano.
+function applicaFipav(){
+  for (const p of partiteCache){
+    const m = fipavMatchDi(p);
+    if (m && m.played){
+      const fenCasa = /FENICE/i.test(m.t1 || '');
+      const fw = fenCasa ? +m.s1 : +m.s2, ow = fenCasa ? +m.s2 : +m.s1;
+      p._autoRis = p.Luogo === 'In casa' ? fw + '-' + ow : ow + '-' + fw;
+      const fp = (fenCasa ? m.pa : m.pb) || [], op = (fenCasa ? m.pb : m.pa) || [];
+      p._sets = (fp.length && fp.length === op.length) ? {fp, op} : null;
+      p._fipavGid = GID_BY_CAT[p.Campionato];
+    } else { p._autoRis = ''; p._sets = null; }
+  }
+}
+function risDi(p){ return (p.Risultato || '').trim() || p._autoRis || ''; }
+function setPanelHtml(p){
+  const s = p._sets, open = expandedSets.has(String(p.rigaExcel));
+  let fw = 0, ow = 0, ft = 0, ot = 0;
+  const cells = s.fp.map((x, i) => {
+    const o = s.op[i], v = x > o; if (v) fw++; else ow++; ft += x; ot += o;
+    return `<div class="set-cell ${v ? 'v' : 'p'}"><small>${i + 1}° SET</small><b>${x}–${o}</b></div>`;
+  }).join('');
+  return `<div class="set-panel${open ? ' open' : ''}" data-panel="${p.rigaExcel}"><div class="in"><div class="set-inner">
+    <div class="set-label">Punti Fenice – Avversario</div>
+    <div class="set-cells">${cells}</div>
+    <div class="set-tot">Set <b>${fw}–${ow}</b> · Punti totali <b>${ft}–${ot}</b></div>
+    <a class="set-fipav" href="https://public.fipavonline.it/gironi/${p._fipavGid}/classifica" target="_blank" rel="noopener">Vedi su FIPAV Online ↗</a>
+  </div></div></div>`;
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-set]');
+  if (!t) return;
+  const k = String(t.dataset.set), card = t.closest('.match-card');
+  const panel = card && card.querySelector(`[data-panel="${k}"]`);
+  if (!panel) return;
+  const open = !expandedSets.has(k);
+  if (open) expandedSets.add(k); else expandedSets.delete(k);
+  panel.classList.toggle('open', open);
+  const btn = card.querySelector('.mini[data-set]'); if (btn) btn.classList.toggle('set-on', open);
+});
+document.addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('tap-set')){ e.preventDefault(); e.target.click(); }
+});
+
+/* --- pannello classifiche --- */
+function clSyncRiga(){
+  const el = $('cl-sync'), live = fipavDB.source === 'live';
+  el.classList.toggle('off', !live);
+  const d = new Date(fipavDB.syncedAt * 1000);
+  el.querySelector('span').textContent = (live ? 'In diretta da FIPAV · ' : 'Dati FIPAV del ') +
+    d.toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit'}) + ' ' + d.toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'});
+}
+function disegnaClassifiche(){
+  const chips = $('cl-chips'); chips.innerHTML = '';
+  const ordine = (ordineCategorie || []).filter(c => GID_BY_CAT[c]);
+  (ordine.length ? ordine : CAT_GIRONI.map(x => x.cat)).forEach(cat => {
+    const gid = GID_BY_CAT[cat], meta = CAT_GIRONI.find(x => x.gid === gid);
+    const b = document.createElement('span');
+    b.className = 'chip' + (gid === clCat ? ' active' : '');
+    b.textContent = meta.label;
+    b.onclick = () => { clCat = gid; disegnaClassifiche(); };
+    chips.appendChild(b);
+  });
+  const g = fipavDB.gironi[clCat], cont = $('cl-tabella');
+  if (!g){ cont.innerHTML = '<p class="muted">Classifica non disponibile.</p>'; clSyncRiga(); return; }
+  const rows = g.teams.slice().sort((a, b) => (+a.pos || 0) - (+b.pos || 0)).map(t => {
+    const fen = t.id === g.feniceId || /FENICE/i.test(t.title || '');
+    const k = clCat + ':' + t.id, open = expandedCl.has(k);
+    const logo = t.logo ? `<img src="${escapeHtml(t.logo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '';
+    return `<tr class="cl-row${fen ? ' fen' : ''}" data-cl="${k}"><td class="pos">${+t.pos || ''}</td><td class="nm"><div class="in">${logo}<span>${escapeHtml(t.title)}</span></div></td><td class="pts">${+t.p || 0}</td><td class="gp">${+t.g || 0}</td><td class="gp">${+t.gv || 0}–${+t.gp || 0}</td></tr>
+    <tr class="cl-det${open ? ' open' : ''}" data-cld="${k}"><td colspan="5"><div class="grid"><div class="in2"><div class="pad"><span class="full">${escapeHtml(t.title)}</span><span>Set vinti–persi <b>${+t.sv || 0}–${+t.sp || 0}</b></span><span>Punti fatti–subiti <b>${+t.pf || 0}–${+t.ps || 0}</b></span><span>Quoz. set <b>${escapeHtml(t.qs)}</b></span><span>Quoz. punti <b>${escapeHtml(t.qp)}</b></span></div></div></div></td></tr>`;
+  }).join('');
+  cont.innerHTML = `<div class="cl-wrap"><table class="cl"><thead><tr><th>#</th><th>Squadra</th><th>PT</th><th>G</th><th>V–P</th></tr></thead><tbody>${rows}</tbody></table><div class="cl-legend"><span><b>PT</b> punti</span><span><b>G</b> giocate</span><span><b>V–P</b> vinte–perse</span><span>${escapeHtml(g.title)} · ${escapeHtml(g.giornata || '')}</span></div></div>`;
+  clSyncRiga();
+}
+document.addEventListener('click', e => {
+  const r = e.target.closest('[data-cl]');
+  if (!r) return;
+  const k = r.dataset.cl, open = !expandedCl.has(k);
+  if (open) expandedCl.add(k); else expandedCl.delete(k);
+  const det = document.querySelector(`[data-cld="${k}"]`);
+  if (det) det.classList.toggle('open', open);
+});
+$('btn-classifiche').onclick = () => {
+  $('sheet-classifiche').hidden = false;
+  disegnaClassifiche();
+  if (Date.now() / 1000 - fipavDB.syncedAt > 300) aggiornaFipav(false);
+};
+$('cl-refresh').onclick = () => aggiornaFipav(true);
+
+/* --- lettura live da FIPAV (con proxy di riserva se il browser blocca CORS) --- */
+async function fipavFetch(url){
+  const idx = FIPAV_PROXIES.map((_, i) => i);
+  if (fipavProxy >= 0 && fipavProxy < idx.length){ idx.splice(idx.indexOf(fipavProxy), 1); idx.unshift(fipavProxy); }
+  for (const i of idx){
+    try{
+      const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 9000);
+      const r = await fetch(FIPAV_PROXIES[i](url), {signal:ctrl.signal, cache:'no-store'});
+      clearTimeout(to);
+      if (!r.ok) continue;
+      const j = await r.json();
+      if (j && (j.data || Array.isArray(j))){
+        if (fipavProxy !== i){ fipavProxy = i; try{ localStorage.setItem('fenice-fipav-proxy', String(i)); }catch(e){} }
+        return j;
+      }
+    }catch(e){}
+  }
+  throw new Error('fipav non raggiungibile');
+}
+function fipavNormalizza(gid, tRes, cRes){
+  const td = (Array.isArray(tRes) ? tRes[0] : tRes).data, cd = (Array.isArray(cRes) ? cRes[0] : cRes).data;
+  if (!td || !td.teams || !cd || !cd.matches) throw new Error('payload inatteso');
+  let fen = null;
+  const teams = td.teams.map(x => {
+    if (/FENICE/i.test(x.title || '')) fen = x.id;
+    const o = {}; for (const k of ['id','title','logo','pos','p','g','gv','gp','sv','sp','pf','ps','qs','qp']) o[k] = x[k];
+    return o;
+  });
+  const matches = cd.matches
+    .filter(m => m.team1 && m.team2 && (m.team1.id === fen || m.team2.id === fen))
+    .map(m => ({id:m.id, ng:String(m.ng), ts:+(m.ts_gara || 0), played:!!m.played, t1:m.team1.title, t2:m.team2.title, s1:m['team1-setwin'], s2:m['team2-setwin'], pa:m.pt_a || [], pb:m.pt_b || []}));
+  const prev = fipavDB.gironi[gid] || {};
+  return {id:gid, short:prev.short || gid, title:td.title, comm:td['commettee-short'] || td.commettee || prev.comm || '', giornata:cd['view-position'] || prev.giornata || '', feniceId:fen || prev.feniceId, teams, matches};
+}
+async function aggiornaFipav(manual){
+  if (clRefreshing) return; clRefreshing = true;
+  const res = await Promise.allSettled(CAT_GIRONI.map(async x => {
+    const [t, c] = await Promise.all([fipavFetch(FIPAV_API + '/tables/' + x.gid), fipavFetch(FIPAV_API + '/calendar/0/' + x.gid)]);
+    return fipavNormalizza(x.gid, t, c);
+  }));
+  let ok = 0;
+  res.forEach((r, i) => { if (r.status === 'fulfilled'){ fipavDB.gironi[CAT_GIRONI[i].gid] = r.value; ok++; } });
+  if (ok){
+    fipavDB.syncedAt = Math.floor(Date.now() / 1000);
+    fipavDB.source = ok === CAT_GIRONI.length ? 'live' : 'partial';
+    try{ localStorage.setItem('fenice-fipav-db', JSON.stringify(fipavDB)); }catch(e){}
+  }
+  clRefreshing = false;
+  applicaFipav();
+  const occupato = rigaInModifica !== null || modificaOrdine || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName));
+  if (!occupato) disegnaLista();
+  if (!$('sheet-classifiche').hidden) disegnaClassifiche();
+  if (manual) toast(ok ? 'Classifiche e risultati aggiornati (' + ok + '/4)' : 'FIPAV non raggiungibile: uso gli ultimi dati');
+}
+setInterval(() => aggiornaFipav(false), 5 * 60 * 1000);
+setTimeout(() => aggiornaFipav(false), 1500);
 
 leggiFoglioGoogle(true);
 setInterval(() => leggiFoglioGoogle(false), 5000);
